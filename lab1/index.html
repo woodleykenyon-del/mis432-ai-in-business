@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Drug Repurposing System</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #0a0e14;
+      --surface:  #111720;
+      --border:   #1e2a38;
+      --accent:   #00d4ff;
+      --accent2:  #7b61ff;
+      --text:     #e2e8f0;
+      --muted:    #64748b;
+      --score3:   #00d4ff;
+      --score2:   #7b61ff;
+      --score1:   #334155;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      min-height: 100vh;
+      padding: 0 1rem 4rem;
+    }
+
+    /* ── HEADER ── */
+    header {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 4rem 0 2rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .tag {
+      display: inline-block;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--accent);
+      border: 1px solid var(--accent);
+      padding: 0.25rem 0.6rem;
+      border-radius: 2px;
+      margin-bottom: 1.5rem;
+    }
+
+    h1 {
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 600;
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+      margin-bottom: 1rem;
+    }
+
+    h1 span { color: var(--accent); }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 1rem;
+      max-width: 560px;
+      line-height: 1.7;
+    }
+
+    /* ── LAYOUT ── */
+    .container { max-width: 900px; margin: 0 auto; }
+
+    /* ── EXPLAINER ── */
+    .explainer {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      margin: 3rem 0;
+    }
+
+    .explainer-step {
+      background: var(--surface);
+      padding: 1.5rem;
+    }
+
+    .step-num {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--accent2);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+    }
+
+    .step-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-bottom: 0.4rem;
+    }
+
+    .step-desc {
+      font-size: 0.8rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    /* ── CONTROLS ── */
+    .controls {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 2rem;
+    }
+
+    .controls label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+    }
+
+    select, input[type="range"] {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.8rem;
+      padding: 0.4rem 0.8rem;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    select:focus { outline: 1px solid var(--accent); }
+
+    .count-badge {
+      margin-left: auto;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .count-badge span { color: var(--accent); }
+
+    /* ── CARDS ── */
+    #results { display: flex; flex-direction: column; gap: 0.75rem; }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem 1.5rem;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 0.5rem 1rem;
+      align-items: start;
+      transition: border-color 0.15s;
+    }
+
+    .card:hover { border-color: var(--accent2); }
+
+    .card-left { min-width: 0; }
+
+    .drug-name {
+      font-size: 1rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+
+    .arrow {
+      color: var(--accent);
+      margin: 0 0.4rem;
+      font-family: 'DM Mono', monospace;
+    }
+
+    .candidate-disease { color: var(--accent); }
+
+    .card-meta {
+      margin-top: 0.5rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+    }
+
+    .pill {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem;
+      padding: 0.2rem 0.5rem;
+      border-radius: 3px;
+      background: #1a2535;
+      color: var(--muted);
+      border: 1px solid var(--border);
+    }
+
+    .pill.target { color: var(--accent2); border-color: var(--accent2); }
+
+    .explanation {
+      margin-top: 0.6rem;
+      font-size: 0.8rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    /* ── SCORE BADGE ── */
+    .score-badge {
+      font-family: 'DM Mono', monospace;
+      font-size: 1.4rem;
+      font-weight: 500;
+      width: 3rem;
+      height: 3rem;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .score-3 { background: rgba(0,212,255,0.1); color: var(--score3); border: 1px solid rgba(0,212,255,0.3); }
+    .score-2 { background: rgba(123,97,255,0.1); color: var(--score2); border: 1px solid rgba(123,97,255,0.3); }
+    .score-1 { background: rgba(51,65,85,0.4);   color: #94a3b8;       border: 1px solid var(--score1); }
+
+    /* ── EMPTY STATE ── */
+    .empty {
+      text-align: center;
+      padding: 3rem;
+      color: var(--muted);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.85rem;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      max-width: 900px;
+      margin: 4rem auto 0;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.78rem;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    footer a { color: var(--accent); text-decoration: none; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="tag">MIS 432 &mdash; Lab 1</div>
+  <h1>Drug <span>Repurposing</span><br/>Discovery System</h1>
+  <p class="subtitle">
+    A simplified version of the EveryCure AI approach. Drugs and diseases are connected
+    through shared biological targets. Higher scores indicate stronger repurposing signals.
+  </p>
+</header>
+
+<div class="container">
+
+  <!-- AI Factory explainer -->
+  <div class="explainer">
+    <div class="explainer-step">
+      <div class="step-num">01 &mdash; Data</div>
+      <div class="step-title">Knowledge Graph</div>
+      <div class="step-desc">Drugs, diseases, and biological targets stored as connected dictionaries.</div>
+    </div>
+    <div class="explainer-step">
+      <div class="step-num">02 &mdash; Model</div>
+      <div class="step-title">Shared Target Scoring</div>
+      <div class="step-desc">Count overlapping biological targets between each drug-disease pair.</div>
+    </div>
+    <div class="explainer-step">
+      <div class="step-num">03 &mdash; Prediction</div>
+      <div class="step-title">Repurposing Score</div>
+      <div class="step-desc">A score of 3 = strong signal. Score of 1 = weak but worth flagging.</div>
+    </div>
+    <div class="explainer-step">
+      <div class="step-num">04 &mdash; Decision</div>
+      <div class="step-title">Researcher Review</div>
+      <div class="step-desc">Researchers filter by score and decide which candidates to test.</div>
+    </div>
+    <div class="explainer-step">
+      <div class="step-num">05 &mdash; Value</div>
+      <div class="step-title">Faster Treatments</div>
+      <div class="step-desc">Approved drugs skip early safety trials, cutting time and cost to patients.</div>
+    </div>
+  </div>
+
+  <!-- Controls -->
+  <div class="controls">
+    <label>MIN SCORE</label>
+    <select id="minScore">
+      <option value="1">1+</option>
+      <option value="2">2+</option>
+      <option value="3">3</option>
+    </select>
+    <label>FILTER DRUG</label>
+    <select id="filterDrug">
+      <option value="all">All Drugs</option>
+    </select>
+    <div class="count-badge">Showing <span id="count">0</span> candidates</div>
+  </div>
+
+  <div id="results"></div>
+
+</div>
+
+<footer>
+  <span>Built with Python &mdash; MIS 432, Western Washington University</span>
+  <span>Data is illustrative. Not medical advice.</span>
+</footer>
+
+<script>
+  // ── DATA ──────────────────────────────────────────────────────────────────
+  const drugIndications = {
+    "Metformin":   "Type 2 Diabetes",
+    "Aspirin":     "Heart Disease",
+    "Thalidomide": "Multiple Myeloma",
+    "Rapamycin":   "Organ Rejection",
+    "Sildenafil":  "Pulmonary Hypertension",
+    "Valproate":   "Epilepsy",
+  };
+
+  const drugTargets = {
+    "Metformin":   ["AMPK","mTOR","IGF-1R"],
+    "Aspirin":     ["COX-1","COX-2","NF-kB"],
+    "Thalidomide": ["TNF-alpha","VEGF","IL-6"],
+    "Rapamycin":   ["mTOR","PI3K","IGF-1R"],
+    "Sildenafil":  ["PDE5","cGMP","VEGF"],
+    "Valproate":   ["HDAC","GSK-3","mTOR"],
+  };
+
+  const diseaseTargets = {
+    "Type 2 Diabetes":        ["AMPK","mTOR","IGF-1R"],
+    "Heart Disease":          ["COX-1","COX-2","VEGF"],
+    "Multiple Myeloma":       ["TNF-alpha","VEGF","IL-6"],
+    "Organ Rejection":        ["mTOR","PI3K"],
+    "Pulmonary Hypertension": ["PDE5","cGMP","VEGF"],
+    "Epilepsy":               ["HDAC","GSK-3","mTOR"],
+    "Colorectal Cancer":      ["COX-2","NF-kB","VEGF"],
+    "Alzheimer's Disease":    ["GSK-3","mTOR","HDAC"],
+    "Aging":                  ["mTOR","AMPK","IGF-1R"],
+    "Breast Cancer":          ["IGF-1R","mTOR","PI3K"],
+  };
+
+  // ── MODEL ────────────────────────────────────────────────────────────────
+  function findCandidates(minScore, filterDrug) {
+    const results = [];
+    for (const [drug, currentDisease] of Object.entries(drugIndications)) {
+      if (filterDrug !== "all" && drug !== filterDrug) continue;
+      const dTargets = new Set(drugTargets[drug]);
+      for (const [disease, diseaseT] of Object.entries(diseaseTargets)) {
+        if (disease === currentDisease) continue;
+        const shared = diseaseT.filter(t => dTargets.has(t));
+        if (shared.length >= minScore) {
+          results.push({ drug, currentDisease, disease, shared, score: shared.length });
+        }
+      }
+    }
+    results.sort((a, b) => b.score - a.score);
+    return results;
+  }
+
+  // ── RENDER ────────────────────────────────────────────────────────────────
+  function scoreClass(s) { return s >= 3 ? "score-3" : s === 2 ? "score-2" : "score-1"; }
+
+  function render() {
+    const minScore  = parseInt(document.getElementById("minScore").value);
+    const filterDrug = document.getElementById("filterDrug").value;
+    const candidates = findCandidates(minScore, filterDrug);
+    const container = document.getElementById("results");
+    document.getElementById("count").textContent = candidates.length;
+
+    if (!candidates.length) {
+      container.innerHTML = '<div class="empty">No candidates match current filters.</div>';
+      return;
+    }
+
+    container.innerHTML = candidates.map(r => `
+      <div class="card">
+        <div class="card-left">
+          <div class="drug-name">
+            ${r.drug}
+            <span class="arrow">→</span>
+            <span class="candidate-disease">${r.disease}</span>
+          </div>
+          <div class="card-meta">
+            <span class="pill">Currently: ${r.currentDisease}</span>
+            ${r.shared.map(t => `<span class="pill target">${t}</span>`).join("")}
+          </div>
+          <div class="explanation">
+            ${r.drug} may help treat ${r.disease} because both are connected
+            to ${r.shared.join(", ")}.
+          </div>
+        </div>
+        <div class="score-badge ${scoreClass(r.score)}">${r.score}</div>
+      </div>
+    `).join("");
+  }
+
+  // ── INIT ──────────────────────────────────────────────────────────────────
+  const drugSelect = document.getElementById("filterDrug");
+  Object.keys(drugIndications).forEach(drug => {
+    const opt = document.createElement("option");
+    opt.value = drug; opt.textContent = drug;
+    drugSelect.appendChild(opt);
+  });
+
+  document.getElementById("minScore").addEventListener("change", render);
+  drugSelect.addEventListener("change", render);
+  render();
+</script>
+</body>
+</html>
