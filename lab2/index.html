@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lab 2: Netflix Artwork &amp; A/B Testing — MIS 432</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../assets/css/styles.css" />
+  <style>
+    /* ── LAB 2 SPECIFIC STYLES ── */
+
+    /* Hero overrides */
+    .lab2-hero {
+      background: #0d0d0d;
+      color: #f1f1f1;
+      padding: 0 0 1px;
+      margin-bottom: 0;
+    }
+
+    .lab2-hero .site-nav {
+      border-bottom-color: #2a2a2a;
+    }
+
+    .lab2-hero .nav-back {
+      color: #888;
+    }
+
+    .lab2-hero .nav-back:hover {
+      color: #e50914;
+    }
+
+    .lab2-hero .nav-brand {
+      color: #aaa;
+      font-weight: 500;
+    }
+
+    .lab2-header {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 3.5rem 1.5rem 3rem;
+      border-bottom: 1px solid #2a2a2a;
+    }
+
+    .lab2-tag {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #e50914;
+      background: rgba(229, 9, 20, 0.12);
+      border: 1px solid rgba(229, 9, 20, 0.3);
+      padding: 0.2rem 0.65rem;
+      border-radius: 3px;
+      margin-bottom: 1.25rem;
+    }
+
+    .lab2-header h1 {
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      font-weight: 700;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.75rem;
+      color: #f1f1f1;
+    }
+
+    .lab2-header h1 em {
+      font-style: normal;
+      color: #e50914;
+    }
+
+    .lab2-header .subtitle {
+      color: #aaa;
+      font-size: 1rem;
+      max-width: 600px;
+      line-height: 1.75;
+    }
+
+    .lab2-meta {
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+      margin-top: 1.75rem;
+    }
+
+    .lab2-meta-item {
+      font-size: 0.78rem;
+      color: #666;
+      font-family: 'DM Mono', monospace;
+    }
+
+    .lab2-meta-item span {
+      color: #aaa;
+      margin-right: 0.4rem;
+    }
+
+    /* Body content */
+    .content-body {
+      background: var(--bg);
+    }
+
+    .content-section {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 2.75rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .content-section:last-of-type {
+      border-bottom: none;
+    }
+
+    .section-label {
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 1.25rem;
+    }
+
+    .content-section h2 {
+      font-size: 1.35rem;
+      font-weight: 700;
+      letter-spacing: -0.015em;
+      margin-bottom: 1rem;
+      color: var(--text);
+    }
+
+    .content-section p {
+      font-size: 0.97rem;
+      color: #374151;
+      line-height: 1.8;
+      margin-bottom: 1rem;
+      max-width: 720px;
+    }
+
+    .content-section p:last-child {
+      margin-bottom: 0;
+    }
+
+    /* Results band */
+    .results-band {
+      background: #111827;
+      color: #f1f1f1;
+      padding: 2.75rem 0;
+    }
+
+    .results-band .inner {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
+
+    .results-band .section-label {
+      color: #666;
+    }
+
+    .results-band h2 {
+      font-size: 1.35rem;
+      font-weight: 700;
+      letter-spacing: -0.015em;
+      margin-bottom: 1.75rem;
+      color: #f1f1f1;
+    }
+
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem;
+    }
+
+    .stat-card {
+      background: #1f2937;
+      border: 1px solid #374151;
+      border-radius: 8px;
+      padding: 1.5rem;
+    }
+
+    .stat-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #6b7280;
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: #f1f1f1;
+      line-height: 1;
+      margin-bottom: 0.35rem;
+    }
+
+    .stat-value.highlight {
+      color: #e50914;
+    }
+
+    .stat-value.positive {
+      color: #10b981;
+    }
+
+    .stat-note {
+      font-size: 0.78rem;
+      color: #6b7280;
+      line-height: 1.4;
+    }
+
+    .recommendation-box {
+      margin-top: 1.5rem;
+      background: rgba(229, 9, 20, 0.08);
+      border: 1px solid rgba(229, 9, 20, 0.25);
+      border-radius: 8px;
+      padding: 1.25rem 1.5rem;
+    }
+
+    .recommendation-box .rec-label {
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #e50914;
+      margin-bottom: 0.5rem;
+    }
+
+    .recommendation-box p {
+      font-size: 0.95rem;
+      color: #d1d5db;
+      line-height: 1.7;
+      margin: 0;
+    }
+
+    /* AI Factory grid */
+    .factory-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      margin-top: 1.25rem;
+    }
+
+    .factory-cell {
+      background: var(--surface);
+      padding: 1.25rem;
+    }
+
+    .factory-step {
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 0.4rem;
+    }
+
+    .factory-title {
+      font-size: 0.88rem;
+      font-weight: 600;
+      margin-bottom: 0.35rem;
+    }
+
+    .factory-desc {
+      font-size: 0.78rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    /* Code block */
+    .code-section {
+      background: #0f172a;
+      padding: 2.75rem 0;
+    }
+
+    .code-section .inner {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
+
+    .code-section .section-label {
+      color: #475569;
+    }
+
+    .code-section h2 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #e2e8f0;
+      margin-bottom: 1.5rem;
+    }
+
+    pre {
+      background: #0a0f1a;
+      border: 1px solid #1e293b;
+      border-radius: 8px;
+      padding: 1.75rem;
+      overflow-x: auto;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.82rem;
+      line-height: 1.7;
+      color: #94a3b8;
+    }
+
+    pre .comment { color: #4b5563; }
+    pre .keyword { color: #818cf8; }
+    pre .string  { color: #6ee7b7; }
+
+    /* Page footer override for dark end */
+    .lab2-footer {
+      background: #0d0d0d;
+      border-top-color: #1f2937;
+      color: #555;
+    }
+
+    .lab2-footer a {
+      color: #e50914;
+    }
+
+    .lab2-footer a:hover {
+      color: #ff3d4a;
+    }
+
+    @media (max-width: 600px) {
+      .stat-grid { grid-template-columns: 1fr 1fr; }
+      .factory-grid { grid-template-columns: 1fr; }
+      .lab2-meta { flex-direction: column; gap: 0.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── DARK HERO ── -->
+<div class="lab2-hero">
+
+  <nav class="site-nav">
+    <span class="nav-brand">MIS 432 &mdash; AI in Business</span>
+    <a href="../index.html" class="nav-back">&larr; Back to Portfolio</a>
+  </nav>
+
+  <div class="lab2-header">
+    <div class="lab2-tag">Lab 2 &mdash; Experimentation</div>
+    <h1>The <em>Netflix</em> Artwork Problem<br/>and A/B Testing</h1>
+    <p class="subtitle">
+      How Netflix decides which image to show you — and what a simulated A/B experiment reveals about the value of evidence over intuition.
+    </p>
+    <div class="lab2-meta">
+      <div class="lab2-meta-item"><span>Course</span>MIS 432: AI in Business</div>
+      <div class="lab2-meta-item"><span>University</span>Western Washington University</div>
+      <div class="lab2-meta-item"><span>Tools</span>Python, NumPy, pandas, statsmodels</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ── BODY CONTENT ── -->
+<div class="content-body">
+
+  <!-- Business Problem -->
+  <div class="content-section">
+    <div class="section-label">Business Problem</div>
+    <h2>Why the image Netflix shows you matters</h2>
+    <p>
+      Netflix has a fundamental engagement problem: users scroll through an enormous catalog, and the first thing that influences whether they click on a title is often its artwork. Which image gets shown matters enormously. Netflix recognized early that no amount of human intuition can reliably predict which visual will resonate with millions of diverse viewers — and that the cost of getting it wrong is measured in clicks, viewing time, and platform engagement.
+    </p>
+    <p>
+      Different images surface different emotions, characters, and themes. One poster might make a drama feel gripping and urgent; another might make it feel slow and forgettable. Because people react to visuals differently, the only way to know what actually works is to test it with real users.
+    </p>
+    <p>
+      This is why Netflix shifted artwork selection from subjective human judgment to a data-driven experimentation system. That shift is an example of <strong>automating a decision</strong> rather than merely augmenting one. When a person reviews test results and picks the winner, the system is augmenting their judgment. When the platform automatically selects and serves the higher-performing image to millions of users based on statistical evidence, the system is making the decision. That distinction matters at scale: automated decisions move faster and reach further, which raises the stakes for accuracy, fairness, and ongoing monitoring.
+    </p>
+    <p>
+      The shift probably made artwork selection more measurable and more responsive to actual user behavior. But it also raised legitimate questions — about whether short-term click metrics can crowd out longer-term creative or brand considerations, and whether the system's outputs are being interpreted and monitored carefully enough.
+    </p>
+  </div>
+
+  <!-- Why A/B Testing -->
+  <div class="content-section">
+    <div class="section-label">Methodology</div>
+    <h2>Why A/B testing — and why it works</h2>
+    <p>
+      A/B testing works because of one foundational principle: <strong>random assignment</strong>. Users are placed into groups — Artwork A or Artwork B — by chance, not by profile or prior behavior. When the two groups are comparable at the start, any difference in outcomes can be attributed to the thing being tested: in this case, the artwork.
+    </p>
+    <p>
+      Without random assignment, the results can be systematically misleading. If more engaged or more curious users ended up in one group by accident, that group might produce a higher click-through rate regardless of which artwork it saw. The experiment would confuse user characteristics with artwork quality, and Netflix could make the wrong rollout decision based on a flawed comparison.
+    </p>
+    <p>
+      Sample size matters for similar reasons. A small experiment can swing heavily due to random variation, making one version look better when there is no real difference. Larger samples produce more stable estimates — the kind needed to justify platform-wide decisions.
+    </p>
+    <p>
+      To evaluate the experiment, three things were needed: how many users saw each version, how many clicked in each group, and whether the observed difference in click-through rate was statistically meaningful or likely due to chance.
+    </p>
+  </div>
+
+  <!-- What I Built -->
+  <div class="content-section">
+    <div class="section-label">What I Built</div>
+    <h2>A simulated A/B experiment in Python</h2>
+    <p>
+      I built a simplified experimentation system in Python that mirrors the core logic of Netflix's artwork testing process. One thousand users were randomly assigned to either Artwork A or Artwork B using NumPy. Each user either clicked or did not, based on defined click probabilities — 24% for Artwork A and 30% for Artwork B. The results were stored in a structured pandas DataFrame and analyzed using a two-proportion z-test from the statsmodels library.
+    </p>
+    <p>
+      The simulation captures the essential structure of a real experiment: random exposure, outcome measurement, statistical comparison, and a clear business question at the end. It is a small-scale classroom version of a decision system that Netflix runs on millions of users simultaneously — which creates its own challenges around data volume, experiment interference, and result interpretation across user segments.
+    </p>
+    <p>
+      Netflix's real system adds considerably more complexity: personalized artwork selection based on viewing history, concurrent experiments running on overlapping user populations, and downstream tracking of whether higher clicks actually lead to longer viewing or improved retention. This simulation captures the decision logic while leaving those layers for future work.
+    </p>
+  </div>
+
+</div>
+
+<!-- ── RESULTS BAND (DARK) ── -->
+<div class="results-band">
+  <div class="inner">
+    <div class="section-label">Key Results</div>
+    <h2>Experiment Results</h2>
+
+    <div class="stat-grid">
+      <div class="stat-card">
+        <div class="stat-label">Artwork A CTR</div>
+        <div class="stat-value">22.86%</div>
+        <div class="stat-note">Out of 500 simulated users assigned to Artwork A</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Artwork B CTR</div>
+        <div class="stat-value positive">29.80%</div>
+        <div class="stat-note">Out of 500 simulated users assigned to Artwork B</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">CTR Difference</div>
+        <div class="stat-value positive">+6.95 pp</div>
+        <div class="stat-note">Percentage point advantage for Artwork B over Artwork A</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">p-value</div>
+        <div class="stat-value highlight">0.0127</div>
+        <div class="stat-note">Below the 0.05 threshold — result is statistically significant</div>
+      </div>
+    </div>
+
+    <div class="recommendation-box">
+      <div class="rec-label">Business Recommendation</div>
+      <p>Artwork B performed better and is the stronger candidate for rollout. The difference in click-through rate is statistically significant, and the magnitude — nearly 7 percentage points — is large enough to be meaningful in a business context. Proceed with Artwork B while continuing to monitor downstream engagement metrics.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ── BACK TO LIGHT ── -->
+<div class="content-body">
+
+  <!-- Statistical Interpretation -->
+  <div class="content-section">
+    <div class="section-label">Statistical Interpretation</div>
+    <h2>What the numbers actually mean</h2>
+    <p>
+      The p-value from the z-test was 0.0127. In plain English: if there were truly no difference between the two artwork versions, you would expect to see a gap this large by random chance only about 1.3% of the time. Because 0.0127 falls below the conventional threshold of 0.05, the result is considered <strong>statistically significant</strong>.
+    </p>
+    <p>
+      That is meaningful, but it does not mean the experiment is fully conclusive on its own. A statistically significant result tells you the difference is unlikely to be noise — it does not tell you that Artwork B will perform better in every context, with every user segment, or over a longer time horizon.
+    </p>
+    <p>
+      Before recommending a full platform rollout, it would be worth checking whether the result holds across different user segments, whether higher clicks translate into longer viewing sessions or improved retention, and whether the result is consistent across repeated experiments. Acting too quickly on a single statistically significant result can lead to rolling out a version that looked good in one test but does not actually improve broader business performance over time.
+    </p>
+    <p>
+      The bar chart produced in the analysis makes the difference immediately visible — which matters in a business setting. When data is communicated clearly and visually, it helps non-technical stakeholders understand the takeaway without needing to interpret raw numbers. Clear visuals help turn analysis into action.
+    </p>
+  </div>
+
+  <!-- AI Factory -->
+  <div class="content-section">
+    <div class="section-label">AI Factory Framework</div>
+    <h2>Mapping the simulation to the AI Factory</h2>
+    <p>
+      The AI Factory framework — Data, Model, Prediction, Decision, Value — describes how organizations turn raw information into business outcomes. This simulation maps directly onto each component:
+    </p>
+
+    <div class="factory-grid">
+      <div class="factory-cell">
+        <div class="factory-step">01 &mdash; Data</div>
+        <div class="factory-title">User Impressions</div>
+        <div class="factory-desc">1,000 simulated records capturing artwork assignment and click outcomes for each user.</div>
+      </div>
+      <div class="factory-cell">
+        <div class="factory-step">02 &mdash; Model</div>
+        <div class="factory-title">Statistical Test</div>
+        <div class="factory-desc">A two-proportion z-test comparing click-through rates across the two groups.</div>
+      </div>
+      <div class="factory-cell">
+        <div class="factory-step">03 &mdash; Prediction</div>
+        <div class="factory-title">Expected Performance</div>
+        <div class="factory-desc">The expectation that one version would generate a meaningfully higher click-through rate.</div>
+      </div>
+      <div class="factory-cell">
+        <div class="factory-step">04 &mdash; Decision</div>
+        <div class="factory-title">Rollout Choice</div>
+        <div class="factory-desc">Whether to keep Artwork A or switch to Artwork B across the platform.</div>
+      </div>
+      <div class="factory-cell">
+        <div class="factory-step">05 &mdash; Value</div>
+        <div class="factory-title">Evidence Over Guessing</div>
+        <div class="factory-desc">Using experimental data to improve engagement rather than relying on designer intuition.</div>
+      </div>
+    </div>
+
+    <p style="margin-top:1.25rem;">
+      The AI Factory frame illustrates why experimentation systems have business value. Each component turns raw user behavior into a decision that can be acted on. The value is not just in having data — it is in building a system that extracts a clear, defensible recommendation from it. Netflix applies this logic at a scale of tens of millions; this lab applies it to 1,000 simulated users. The underlying structure is the same.
+    </p>
+  </div>
+
+  <!-- Reflection -->
+  <div class="content-section">
+    <div class="section-label">Reflection</div>
+    <h2>From notebook to portfolio</h2>
+    <p>
+      A hiring manager or client is unlikely to open a Jupyter notebook, but they will click a link. Turning a Python analysis into a public-facing page is not just a formatting exercise — it is an act of communication. It signals that you can do more than run analysis in the background. It shows you can package technical work into something understandable, presentable, and useful for decision-makers.
+    </p>
+    <p>
+      One of the clearest lessons from this lab is that a number alone is not a decision. Getting a statistically significant p-value is the beginning of an argument, not the end of one. The ability to explain what that result means, what it does and does not prove, and what a reasonable next step looks like — that is the part that connects analysis to real-world value.
+    </p>
+  </div>
+
+</div>
+
+<!-- ── CODE BLOCK (DARK) ── -->
+<div class="code-section">
+  <div class="inner">
+    <div class="section-label">Source Code</div>
+    <h2>Full Python Code</h2>
+    <pre>import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from statsmodels.stats.proportion import proportions_ztest
+
+# Set random seed for reproducibility
+np.random.seed(42)
+
+# Step 1: Simulate the experiment
+n_users = 1000
+user_ids = np.arange(1, n_users + 1)
+
+# Randomly assign users to Artwork A or Artwork B
+artwork_versions = np.random.choice(['A', 'B'], size=n_users)
+
+# Define click probabilities
+click_probs = {'A': 0.24, 'B': 0.30}
+
+# Simulate clicks based on assigned artwork version
+clicked = [np.random.binomial(1, click_probs[version]) for version in artwork_versions]
+
+# Create DataFrame
+df = pd.DataFrame({
+    'user_id': user_ids,
+    'artwork_version': artwork_versions,
+    'clicked': clicked
+})
+
+# Step 2: Measure performance
+summary = df.groupby('artwork_version').agg(
+    total_users=('user_id', 'count'),
+    total_clicks=('clicked', 'sum')
+)
+
+summary['ctr'] = summary['total_clicks'] / summary['total_users']
+summary['ctr_percent'] = (summary['ctr'] * 100).round(2)
+
+print("Experiment Summary:")
+print(summary[['total_users', 'total_clicks', 'ctr_percent']])
+print()
+
+# Step 3: Visualize click-through rate
+plt.figure(figsize=(8, 5))
+bars = plt.bar(summary.index, summary['ctr'])
+
+plt.title('Click-Through Rate by Artwork Version')
+plt.xlabel('Artwork Version')
+plt.ylabel('Click-Through Rate')
+plt.ylim(0, max(summary['ctr']) + 0.05)
+
+for bar, value in zip(bars, summary['ctr']):
+    plt.text(
+        bar.get_x() + bar.get_width() / 2,
+        value + 0.005,
+        f"{value:.2%}",
+        ha='center'
+    )
+
+plt.show()
+
+# Step 4: Statistical test (two-proportion z-test)
+click_counts = summary['total_clicks'].values
+group_sizes = summary['total_users'].values
+
+z_stat, p_value = proportions_ztest(count=click_counts, nobs=group_sizes)
+
+# Step 5: Business interpretation
+ctr_a = summary.loc['A', 'ctr']
+ctr_b = summary.loc['B', 'ctr']
+ctr_diff = ctr_b - ctr_a
+
+print(f"Z-statistic: {z_stat:.4f}")
+print(f"P-value: {p_value:.4f}")
+print()
+print(f"CTR for Artwork A: {ctr_a:.2%}")
+print(f"CTR for Artwork B: {ctr_b:.2%}")
+print(f"Difference in CTR (B - A): {ctr_diff:.2%}")
+print()
+
+alpha = 0.05
+if p_value &lt; alpha:
+    print("Conclusion: The difference in click-through rates is statistically significant.")
+    if ctr_b &gt; ctr_a:
+        print("Business Recommendation: Artwork B performed better and would be the stronger candidate for rollout.")
+    else:
+        print("Business Recommendation: Artwork A performed better and would be the stronger candidate for rollout.")
+else:
+    print("Conclusion: The difference in click-through rates is not statistically significant.")
+    print("Business Recommendation: Do not make a full rollout decision yet. Collect more data before switching.")</pre>
+  </div>
+</div>
+
+<!-- ── FOOTER ── -->
+<footer class="site-footer lab2-footer">
+  <span>MIS 432: AI in Business &mdash; Western Washington University &mdash; Kenyon Woodley</span>
+  <a href="../index.html">&larr; Back to Portfolio</a>
+</footer>
+
+</body>
+</html>

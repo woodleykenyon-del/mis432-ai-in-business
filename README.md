@@ -1,1 +1,34 @@
-This repo contains lab work for MIS 432 AI in Business at Western Washington University.
+# MIS 432: AI in Business
+
+Course portfolio for **MIS 432: AI in Business** at Western Washington University.
+
+This repo documents hands-on labs and a group project focused on building simplified AI systems for business decision-making.
+
+## Portfolio
+
+**[View the course portfolio](https://woodleykenyon-del.github.io/mis432-ai-in-business/)**
+
+## Projects
+
+| Project | Description | Status |
+|---------|-------------|--------|
+| [Lab 1: Drug Repurposing](https://woodleykenyon-del.github.io/mis432-ai-in-business/lab1/) | EveryCure-style drug repurposing system using shared biological targets | Complete |
+| [Lab 2: Netflix A/B Testing](https://woodleykenyon-del.github.io/mis432-ai-in-business/lab2/) | Simulated A/B experiment on artwork click-through rates with statistical testing | Complete |
+| Lab 3 | Coming soon | In progress |
+| Group Project: Milestone 1 | Coming soon | In progress |
+| Group Project: Milestone 2 | Coming soon | In progress |
+| Group Project: Milestone 3 | Coming soon | In progress |
+
+## Structure
+
+```
+index.html                    # Course portfolio homepage
+assets/css/styles.css         # Shared portfolio styles
+lab1/index.html               # Lab 1: Drug Repurposing Discovery System
+lab1/everycure.py             # Lab 1 Python source
+lab2/index.html               # Lab 2: Netflix Artwork & A/B Testing
+lab3/index.html               # Lab 3 (placeholder)
+project/milestone1/index.html # Group Project Milestone 1 (placeholder)
+project/milestone2/index.html # Group Project Milestone 2 (placeholder)
+project/milestone3/index.html # Group Project Milestone 3 (placeholder)
+```
