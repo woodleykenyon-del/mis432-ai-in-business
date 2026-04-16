@@ -3,31 +3,924 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Lab 3 — MIS 432: AI in Business</title>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,600;9..40,700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="../assets/css/styles.css" />
+  <title>Lab 3: Spotify Recommendation Systems &amp; Wrapped &mdash; MIS 432</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #191414;
+      --surface:  #282828;
+      --surface2: #333333;
+      --border:   #404040;
+      --green:    #1DB954;
+      --green-dk: #17903f;
+      --text:     #FFFFFF;
+      --muted:    #B3B3B3;
+      --subdued:  #6a6a6a;
+      --radius:   8px;
+      --font:     'DM Sans', sans-serif;
+      --mono:     'DM Mono', monospace;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    a { color: var(--green); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* NAV */
+    .site-nav {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 1.25rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-brand { font-size: 0.85rem; font-weight: 600; color: var(--muted); }
+    .nav-back {
+      font-size: 0.82rem;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      transition: color 0.15s;
+    }
+    .nav-back:hover { color: var(--green); text-decoration: none; }
+
+    /* HERO */
+    .hero {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 3.5rem 1.5rem 3rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .tag {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--green);
+      background: rgba(29,185,84,0.12);
+      padding: 0.2rem 0.65rem;
+      border-radius: 3px;
+      margin-bottom: 1.25rem;
+    }
+    .hero h1 {
+      font-size: clamp(1.8rem, 4vw, 2.6rem);
+      font-weight: 700;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.75rem;
+    }
+    .hero h1 span { color: var(--green); }
+    .hero .subtitle {
+      color: var(--muted);
+      font-size: 1rem;
+      max-width: 640px;
+      line-height: 1.75;
+    }
+    .course-note { margin-top: 1rem; font-size: 0.8rem; color: var(--subdued); }
+
+    /* CONTAINER */
+    .container { max-width: 980px; margin: 0 auto; padding: 0 1.5rem; }
+
+    /* SECTION */
+    .section { padding: 3rem 0; border-bottom: 1px solid var(--border); }
+    .section:last-child { border-bottom: none; }
+    .section-label {
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--green);
+      margin-bottom: 1.75rem;
+    }
+
+    /* STORY GRID */
+    .story-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+    }
+    .story-block {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.75rem;
+    }
+    .story-block h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.6rem; }
+    .story-block p  { font-size: 0.875rem; color: var(--muted); line-height: 1.75; }
+
+    /* HIGHLIGHT BLOCK */
+    .highlight-block {
+      background: rgba(29,185,84,0.07);
+      border: 1px solid rgba(29,185,84,0.2);
+      border-radius: var(--radius);
+      padding: 1.75rem;
+      margin-top: 1.25rem;
+    }
+    .highlight-block h3 { font-size: 0.95rem; font-weight: 600; color: var(--green); margin-bottom: 0.6rem; }
+    .highlight-block p  { font-size: 0.875rem; color: var(--muted); line-height: 1.75; }
+
+    /* TAKEAWAYS */
+    .takeaway-list {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 1.25rem;
+    }
+    .takeaway {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+    }
+    .takeaway-num { font-size: 1.4rem; font-weight: 700; color: var(--green); margin-bottom: 0.5rem; }
+    .takeaway h4  { font-size: 0.875rem; font-weight: 600; margin-bottom: 0.5rem; }
+    .takeaway p   { font-size: 0.82rem; color: var(--muted); line-height: 1.65; }
+
+    /* DEMO */
+    .demo-header { margin-bottom: 2rem; }
+    .demo-header h2 { font-size: 1.4rem; font-weight: 700; margin-bottom: 0.4rem; }
+    .demo-header p  { font-size: 0.875rem; color: var(--muted); max-width: 620px; line-height: 1.7; }
+
+    .demo-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+      align-items: start;
+    }
+
+    /* CATALOG */
+    .catalog-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .panel-header {
+      padding: 0.875rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .song-list { max-height: 570px; overflow-y: auto; }
+    .song-list::-webkit-scrollbar { width: 4px; }
+    .song-list::-webkit-scrollbar-track { background: transparent; }
+    .song-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    .song-item {
+      display: flex;
+      align-items: center;
+      padding: 0.625rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+      gap: 0.625rem;
+      transition: background 0.1s;
+    }
+    .song-item:last-child  { border-bottom: none; }
+    .song-item:hover       { background: var(--surface2); }
+    .song-item.interacted .song-title { color: var(--muted); }
+
+    .song-info { flex: 1; min-width: 0; }
+    .song-title {
+      font-size: 0.845rem;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .song-meta {
+      font-size: 0.72rem;
+      color: var(--muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .genre-badge {
+      font-size: 0.6rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 0.15rem 0.4rem;
+      border-radius: 3px;
+      background: var(--surface2);
+      color: var(--muted);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .song-actions { display: flex; gap: 0.3rem; flex-shrink: 0; }
+
+    .btn {
+      font-family: var(--font);
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 0.275rem 0.55rem;
+      border-radius: 4px;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: all 0.12s;
+      white-space: nowrap;
+      line-height: 1;
+    }
+    .btn-skip   { background: transparent; border-color: var(--border); color: var(--muted); }
+    .btn-skip:hover { border-color: #888; color: var(--text); }
+    .btn-play   { background: var(--surface2); border-color: var(--border); color: var(--text); }
+    .btn-play:hover { border-color: var(--green); color: var(--green); }
+    .btn-replay { background: var(--green); border-color: var(--green); color: #000; font-weight: 700; }
+    .btn-replay:hover { background: var(--green-dk); border-color: var(--green-dk); }
+
+    /* RIGHT COLUMN */
+    .right-col { display: flex; flex-direction: column; gap: 1rem; }
+    .panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+
+    /* COUNTERS */
+    .counters-row { display: grid; grid-template-columns: 1fr 1fr 1fr; padding: 0.875rem; gap: 0.625rem; }
+    .counter-item { text-align: center; padding: 0.625rem; background: var(--surface2); border-radius: 6px; }
+    .counter-value { font-size: 1.4rem; font-weight: 700; line-height: 1; color: var(--green); font-variant-numeric: tabular-nums; }
+    .counter-label { font-size: 0.62rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-top: 0.25rem; }
+
+    /* RECOMMENDATIONS */
+    .rec-item {
+      display: flex;
+      align-items: center;
+      padding: 0.625rem 1.25rem;
+      gap: 0.625rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .rec-item:last-child { border-bottom: none; }
+    .rec-rank  { font-size: 0.72rem; font-weight: 700; color: var(--green); width: 1.1rem; text-align: center; flex-shrink: 0; }
+    .rec-info  { flex: 1; min-width: 0; }
+    .rec-title { font-size: 0.845rem; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .rec-meta  { font-size: 0.72rem; color: var(--muted); }
+    .rec-score { font-size: 0.68rem; font-family: var(--mono); color: var(--green); flex-shrink: 0; }
+    .rec-placeholder { padding: 1.25rem; text-align: center; color: var(--subdued); font-size: 0.82rem; line-height: 1.6; }
+
+    /* LOG */
+    .log-body {
+      padding: 0.75rem 1.25rem;
+      max-height: 140px;
+      overflow-y: auto;
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+    .log-body::-webkit-scrollbar { width: 4px; }
+    .log-body::-webkit-scrollbar-track { background: transparent; }
+    .log-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+    .log-empty { padding: 0.875rem 1.25rem; font-size: 0.78rem; color: var(--subdued); font-style: italic; }
+    .log-ts     { color: var(--subdued); }
+    .log-play   { color: #1ed760; }
+    .log-skip   { color: #e05a5a; }
+    .log-replay { color: var(--green); }
+
+    /* WRAPPED */
+    .wrapped-trigger { padding: 1rem 1.25rem; display: flex; flex-direction: column; gap: 0.625rem; }
+    .wrapped-progress-text { font-size: 0.78rem; color: var(--muted); }
+    .progress-bar  { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; margin-top: 0.35rem; }
+    .progress-fill { height: 100%; background: var(--green); border-radius: 2px; transition: width 0.3s; }
+    .btn-wrapped {
+      font-family: var(--font);
+      font-size: 0.845rem;
+      font-weight: 700;
+      padding: 0.7rem 1.5rem;
+      background: var(--green);
+      color: #000;
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.15s;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      width: 100%;
+    }
+    .btn-wrapped:hover:not(:disabled) { background: var(--green-dk); transform: scale(1.015); }
+    .btn-wrapped:disabled { background: var(--surface2); color: var(--subdued); cursor: default; transform: none; }
+
+    .wrapped-result {
+      display: none;
+      padding: 1.5rem;
+      background: linear-gradient(145deg, #1a0a2e 0%, #0b1f0f 100%);
+      border-top: 1px solid var(--border);
+    }
+    .wrapped-result.visible { display: block; }
+    .wrapped-heading { font-size: 1.05rem; font-weight: 700; color: var(--green); margin-bottom: 1.25rem; letter-spacing: -0.01em; }
+    .wrapped-stat { margin-bottom: 0.875rem; }
+    .wrapped-stat-label {
+      font-size: 0.62rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--subdued);
+      margin-bottom: 0.25rem;
+    }
+    .wrapped-stat-value { font-size: 0.95rem; font-weight: 600; color: var(--text); }
+    .wrapped-stat-value.accent { color: var(--green); }
+    .wrapped-song-row { font-size: 0.85rem; line-height: 1.7; }
+    .wrapped-song-row span { color: var(--subdued); font-size: 0.78rem; }
+    .wrapped-tagline {
+      margin-top: 1.125rem;
+      font-size: 0.85rem;
+      font-style: italic;
+      color: var(--muted);
+      border-top: 1px solid rgba(255,255,255,0.07);
+      padding-top: 0.875rem;
+      line-height: 1.65;
+    }
+    .wrapped-footnote { margin-top: 0.625rem; font-size: 0.72rem; color: var(--subdued); line-height: 1.55; }
+
+    /* FOOTER */
+    .site-footer {
+      max-width: 980px;
+      margin: 3rem auto 0;
+      padding: 1.75rem 1.5rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.8rem;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 720px) {
+      .story-grid     { grid-template-columns: 1fr; }
+      .demo-layout    { grid-template-columns: 1fr; }
+      .takeaway-list  { grid-template-columns: 1fr; }
+      .site-footer    { flex-direction: column; }
+      .site-nav       { flex-direction: column; align-items: flex-start; gap: 0.25rem; }
+    }
+  </style>
 </head>
 <body>
 
 <nav class="site-nav">
   <span class="nav-brand">MIS 432 &mdash; AI in Business</span>
-  <a href="../index.html" class="nav-back">&larr; Back to Portfolio</a>
+  <a href="../" class="nav-back">&#8592; Back to portfolio</a>
 </nav>
 
+<header class="hero">
+  <div class="tag">Lab 3</div>
+  <h1>Spotify and the <span>Recommendation Engine</span></h1>
+  <p class="subtitle">
+    How Spotify turns behavioral data into personalized discovery, and why the same signals that drive daily recommendations also produce your annual Wrapped.
+  </p>
+  <p class="course-note">MIS 432: AI in Business &mdash; Western Washington University</p>
+</header>
+
 <div class="container">
-  <div class="placeholder-wrap">
-    <div class="placeholder-icon">&#9675;</div>
-    <div class="tag">Lab 3</div>
-    <h1>Coming Soon</h1>
-    <p>This lab is in progress. Check back as the quarter continues.</p>
-    <a href="../index.html" class="back-link">&larr; Return to Portfolio</a>
+
+  <!-- THE BUSINESS PROBLEM -->
+  <div class="section">
+    <div class="section-label">The Business Problem</div>
+
+    <div class="story-grid">
+      <div class="story-block">
+        <h3>Too Much Music, Not Enough Attention</h3>
+        <p>
+          Spotify hosts over 100 million tracks. A dedicated listener might meaningfully engage with a few thousand songs over a lifetime of active listening. Without a system that filters and surfaces relevant content, the catalog becomes a liability. Users who cannot find music they care about do not keep paying. The core business problem is not licensing or storage. It is relevance at scale.
+        </p>
+      </div>
+
+      <div class="story-block">
+        <h3>What a Recommendation Engine Actually Does</h3>
+        <p>
+          A recommendation engine learns what someone values by watching what they do, not by asking them. It records behavior. Every time a listener replays a track, skips an artist after four seconds, or lets an album play all the way through, the system logs a signal. Over millions of interactions, those signals build a portrait of taste more precise than anything a person could type into a search box.
+        </p>
+      </div>
+    </div>
+
+    <div class="highlight-block">
+      <h3>Why Implicit Signals Work Better Than Ratings</h3>
+      <p>
+        An explicit rating system sounds intuitive but performs poorly. People rate inconsistently. They rate socially, inflating scores for albums they feel they should appreciate. Most users never rate anything at all. Implicit signals solve this. A skip at the eight-second mark is a more honest negative signal than a one-star review. A third replay of the same song is a more honest positive signal than five stars. The data comes from behavior, and behavior does not lie the way surveys do.
+      </p>
+    </div>
   </div>
+
+  <!-- HOW THE SYSTEM WORKS -->
+  <div class="section">
+    <div class="section-label">How the System Works</div>
+
+    <div class="story-grid">
+      <div class="story-block">
+        <h3>Feature Engineering</h3>
+        <p>
+          Raw listening events carry no meaning on their own. Feature engineering converts raw data into structured inputs the model can learn from. For Spotify, this means translating events into engagement scores, grouping songs by acoustic similarity, tagging content by genre and mood, and producing numerical vectors that represent listener preferences. The quality of these features determines the ceiling for model performance. Weak features produce weak predictions regardless of how sophisticated the model is.
+        </p>
+      </div>
+
+      <div class="story-block">
+        <h3>Collaborative Filtering</h3>
+        <p>
+          Collaborative filtering rests on one insight: people who agreed in the past tend to agree in the future. The system identifies listeners whose behavioral patterns resemble yours, then surfaces what those listeners enjoyed that you have not heard yet. No understanding of the music itself is required. The model does not need to know that two songs share a tempo or a key. It only needs to know that people who liked one tended to like the other. The catalog describes itself through the behavior of the people who listen to it.
+        </p>
+      </div>
+
+      <div class="story-block">
+        <h3>Clustering and Unsupervised Learning</h3>
+        <p>
+          Clustering groups users or songs without predefined labels, letting the algorithm find natural structure in the data. Spotify uses this to discover listener archetypes that no marketing team would have named in advance, like people who alternate between ambient and aggressive music depending on the time of day. These clusters become the foundation for playlist generation, contextual recommendations, and content acquisition decisions. The model surfaces things the business did not know to look for.
+        </p>
+      </div>
+
+      <div class="story-block">
+        <h3>Recommendations and Wrapped Share the Same Data</h3>
+        <p>
+          Spotify Wrapped and the daily recommendation engine both run on behavioral data from the same pipeline. The difference is direction. Recommendations process that data continuously to predict what to play next. Wrapped aggregates it annually to surface a personalized summary of how you listened. One looks forward; the other looks back. The underlying infrastructure is shared. Investing once in a strong data foundation returns value across multiple products built on top of it.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- RISK AND GOVERNANCE -->
+  <div class="section">
+    <div class="section-label">Risk and Governance</div>
+
+    <div class="story-grid">
+      <div class="story-block">
+        <h3>The Training-Serving Gap</h3>
+        <p>
+          A model is trained on historical data, then deployed against new data that keeps changing. The model has no awareness of that change. If listening patterns shift, a song goes viral, or an artist's audience evolves, a stale model continues predicting from the old distribution without raising any flags. There are no error messages. Recommendations quietly degrade. This is called silent failure, and it is one of the most dangerous failure modes in production AI because the system appears to be working while delivering declining value.
+        </p>
+      </div>
+
+      <div class="story-block">
+        <h3>AI Governance Is a Management Problem</h3>
+        <p>
+          Deciding how a recommendation engine should behave is not a technical question. Should the system optimize purely for engagement even when that means narrowing what users discover? How should it handle new artists with no listening history? When does personalization become a filter bubble? These are business and ethics questions. They require policy, oversight, and accountability structures. Technology can implement any answer you give it. The answer itself has to come from human judgment, and someone has to own responsibility for making it.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAKEAWAYS -->
+  <div class="section">
+    <div class="section-label">Business Takeaways</div>
+
+    <div class="takeaway-list">
+      <div class="takeaway">
+        <div class="takeaway-num">01</div>
+        <h4>Behavioral data outperforms stated preferences</h4>
+        <p>What users do consistently outperforms what they say they want. Systems that observe behavior rather than solicit ratings produce more accurate predictions and impose less friction on users who would never bother filling out a form.</p>
+      </div>
+
+      <div class="takeaway">
+        <div class="takeaway-num">02</div>
+        <h4>One data foundation powers multiple products</h4>
+        <p>Recommendations and Wrapped are not separate systems. They share a pipeline and a behavioral model. Organizations that invest in core data infrastructure can build multiple products from the same foundation, multiplying the return on that original investment.</p>
+      </div>
+
+      <div class="takeaway">
+        <div class="takeaway-num">03</div>
+        <h4>Silent failure requires proactive monitoring</h4>
+        <p>AI systems do not announce when they degrade. Managers responsible for AI-driven products need drift detection, monitoring frameworks, and scheduled retraining built into operations from day one, not added as an afterthought after performance visibly drops.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- INTERACTIVE DEMO -->
+  <div class="section">
+    <div class="section-label">Live Demo</div>
+
+    <div class="demo-header">
+      <h2>Try the Recommendation Engine</h2>
+      <p>
+        Interact with the catalog using Skip, Play, and Replay. The system scores each action as an implicit signal, then uses cosine similarity against nine predefined listener profiles to surface songs similar listeners enjoyed that you have not heard yet. The same interaction log also powers Wrapped.
+      </p>
+    </div>
+
+    <div class="demo-layout">
+
+      <!-- Left: Catalog -->
+      <div class="catalog-panel">
+        <div class="panel-header">
+          <span>Song Catalog</span>
+          <span id="interaction-count">0 interactions</span>
+        </div>
+        <div class="song-list" id="song-list"></div>
+      </div>
+
+      <!-- Right: Output panels -->
+      <div class="right-col">
+
+        <div class="panel">
+          <div class="panel-header"><span>Signal Counters</span></div>
+          <div class="counters-row">
+            <div class="counter-item">
+              <div class="counter-value" id="cnt-play">0</div>
+              <div class="counter-label">Plays</div>
+            </div>
+            <div class="counter-item">
+              <div class="counter-value" id="cnt-skip">0</div>
+              <div class="counter-label">Skips</div>
+            </div>
+            <div class="counter-item">
+              <div class="counter-value" id="cnt-replay">0</div>
+              <div class="counter-label">Replays</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <span>Recommendations</span>
+            <span id="rec-status" style="font-size:0.7rem;color:var(--subdued)">Awaiting signals</span>
+          </div>
+          <div id="rec-list">
+            <div class="rec-placeholder">Play, skip, or replay songs to see recommendations generated from your behavior.</div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header"><span>Implicit Signal Log</span></div>
+          <div id="data-log" class="log-empty">No signals recorded yet.</div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header"><span>Your Wrapped</span></div>
+          <div class="wrapped-trigger">
+            <div class="wrapped-progress-text" id="wrapped-progress-text">5 interactions needed to unlock Wrapped</div>
+            <div class="progress-bar">
+              <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+            </div>
+            <button class="btn-wrapped" id="btn-wrapped" disabled onclick="generateWrapped()">
+              Generate My Wrapped
+            </button>
+          </div>
+          <div class="wrapped-result" id="wrapped-result"></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <footer class="site-footer">
   <span>MIS 432: AI in Business &mdash; Western Washington University</span>
-  <span>Kenyon Woodley</span>
+  <span>Kenyon Woodley &mdash; <a href="../">View Portfolio</a></span>
 </footer>
 
+<script>
+// ============================================================
+//  DATA
+// ============================================================
+
+var SONGS = [
+  { title: 'Blinding Lights',     artist: 'The Weeknd',                   genre: 'Pop'      },
+  { title: 'HUMBLE.',             artist: 'Kendrick Lamar',               genre: 'Hip-Hop'  },
+  { title: 'Levitating',          artist: 'Dua Lipa',                     genre: 'Pop'      },
+  { title: 'bad guy',             artist: 'Billie Eilish',                genre: 'Indie Pop' },
+  { title: "God's Plan",          artist: 'Drake',                        genre: 'Hip-Hop'  },
+  { title: 'As It Was',           artist: 'Harry Styles',                 genre: 'Pop'      },
+  { title: 'MONTERO',             artist: 'Lil Nas X',                    genre: 'Hip-Hop'  },
+  { title: 'drivers license',     artist: 'Olivia Rodrigo',               genre: 'Pop'      },
+  { title: 'Watermelon Sugar',    artist: 'Harry Styles',                 genre: 'Pop'      },
+  { title: 'Peaches',             artist: 'Justin Bieber',                genre: 'R&B'      },
+  { title: 'Industry Baby',       artist: 'Lil Nas X',                    genre: 'Hip-Hop'  },
+  { title: 'good 4 u',            artist: 'Olivia Rodrigo',               genre: 'Pop Rock' },
+  { title: 'Leave The Door Open', artist: 'Bruno Mars',                   genre: 'R&B'      },
+  { title: 'STAY',                artist: 'The Kid LAROI & Justin Bieber',genre: 'Pop'      },
+  { title: 'Heat Waves',          artist: 'Glass Animals',                genre: 'Indie'    }
+];
+
+var SIGNAL_SCORES = { replay: 0.9, play: 0.5, skip: 0.1 };
+
+var USERS = [
+  { 'As It Was':0.9,'Blinding Lights':0.9,"God's Plan":0.1,'HUMBLE.':0.1,'Heat Waves':0.5,'Industry Baby':0.1,'Leave The Door Open':0.1,'Levitating':0.9,'MONTERO':0.5,'Peaches':0.1,'STAY':0.9,'Watermelon Sugar':0.9,'bad guy':0.1,'drivers license':0.9,'good 4 u':0.5 },
+  { 'As It Was':0.5,'Blinding Lights':0.9,"God's Plan":0.1,'HUMBLE.':0.1,'Heat Waves':0.5,'Industry Baby':0.1,'Leave The Door Open':0.1,'Levitating':0.9,'MONTERO':0.1,'Peaches':0.9,'STAY':0.5,'Watermelon Sugar':0.9,'bad guy':0.5,'drivers license':0.9,'good 4 u':0.1 },
+  { 'As It Was':0.1,'Blinding Lights':0.1,"God's Plan":0.9,'HUMBLE.':0.9,'Heat Waves':0.1,'Industry Baby':0.9,'Leave The Door Open':0.1,'Levitating':0.1,'MONTERO':0.5,'Peaches':0.5,'STAY':0.1,'Watermelon Sugar':0.5,'bad guy':0.9,'drivers license':0.1,'good 4 u':0.1 },
+  { 'As It Was':0.5,'Blinding Lights':0.1,"God's Plan":0.9,'HUMBLE.':0.9,'Heat Waves':0.5,'Industry Baby':0.9,'Leave The Door Open':0.1,'Levitating':0.1,'MONTERO':0.9,'Peaches':0.1,'STAY':0.1,'Watermelon Sugar':0.9,'bad guy':0.5,'drivers license':0.1,'good 4 u':0.1 },
+  { 'As It Was':0.9,'Blinding Lights':0.9,"God's Plan":0.9,'HUMBLE.':0.5,'Heat Waves':0.5,'Industry Baby':0.1,'Leave The Door Open':0.5,'Levitating':0.5,'MONTERO':0.1,'Peaches':0.9,'STAY':0.5,'Watermelon Sugar':0.5,'bad guy':0.5,'drivers license':0.1,'good 4 u':0.5 },
+  { 'As It Was':0.9,'Blinding Lights':0.9,"God's Plan":0.1,'HUMBLE.':0.5,'Heat Waves':0.1,'Industry Baby':0.1,'Leave The Door Open':0.9,'Levitating':0.9,'MONTERO':0.1,'Peaches':0.9,'STAY':0.9,'Watermelon Sugar':0.5,'bad guy':0.1,'drivers license':0.9,'good 4 u':0.9 },
+  { 'As It Was':0.5,'Blinding Lights':0.1,"God's Plan":0.1,'HUMBLE.':0.5,'Heat Waves':0.9,'Industry Baby':0.1,'Leave The Door Open':0.1,'Levitating':0.9,'MONTERO':0.9,'Peaches':0.5,'STAY':0.5,'Watermelon Sugar':0.9,'bad guy':0.9,'drivers license':0.5,'good 4 u':0.5 },
+  { 'As It Was':0.5,'Blinding Lights':0.9,"God's Plan":0.9,'HUMBLE.':0.1,'Heat Waves':0.1,'Industry Baby':0.9,'Leave The Door Open':0.5,'Levitating':0.9,'MONTERO':0.1,'Peaches':0.9,'STAY':0.9,'Watermelon Sugar':0.9,'bad guy':0.5,'drivers license':0.9,'good 4 u':0.9 },
+  { 'As It Was':0.5,'Blinding Lights':0.9,"God's Plan":0.9,'HUMBLE.':0.9,'Heat Waves':0.1,'Industry Baby':0.9,'Leave The Door Open':0.5,'Levitating':0.9,'MONTERO':0.9,'Peaches':0.5,'STAY':0.9,'Watermelon Sugar':0.9,'bad guy':0.1,'drivers license':0.9,'good 4 u':0.1 }
+];
+
+// ============================================================
+//  STATE
+// ============================================================
+
+var userVec  = {};   // song title -> latest engagement score
+var eventLog = [];   // all raw events
+var cntPlay = 0, cntSkip = 0, cntReplay = 0;
+
+// ============================================================
+//  COSINE SIMILARITY
+// ============================================================
+
+function cosineSimilarity(vecA, vecB) {
+  var dot = 0, normA = 0, normB = 0;
+  for (var i = 0; i < SONGS.length; i++) {
+    var t = SONGS[i].title;
+    var a = vecA[t] || 0;
+    var b = vecB[t] || 0;
+    dot   += a * b;
+    normA += a * a;
+    normB += b * b;
+  }
+  if (normA === 0 || normB === 0) return 0;
+  return dot / (Math.sqrt(normA) * Math.sqrt(normB));
+}
+
+// ============================================================
+//  RECOMMENDATIONS
+// ============================================================
+
+function computeRecommendations() {
+  var interacted = {};
+  for (var key in userVec) { interacted[key] = true; }
+  if (Object.keys(interacted).length === 0) return [];
+
+  // Similarity to each predefined user
+  var sims = [];
+  for (var u = 0; u < USERS.length; u++) {
+    sims.push({ u: u, sim: cosineSimilarity(userVec, USERS[u]) });
+  }
+  sims.sort(function(a, b) { return b.sim - a.sim; });
+
+  // Weighted-sum candidates from top-5 similar users
+  var candidates = {};
+  for (var s = 0; s < Math.min(5, sims.length); s++) {
+    var sim = sims[s].sim;
+    if (sim <= 0) continue;
+    var uvec = USERS[sims[s].u];
+    for (var i = 0; i < SONGS.length; i++) {
+      var title = SONGS[i].title;
+      if (!interacted[title]) {
+        candidates[title] = (candidates[title] || 0) + sim * (uvec[title] || 0);
+      }
+    }
+  }
+
+  var results = [];
+  for (var title in candidates) {
+    if (candidates[title] > 0) {
+      results.push({ song: findSong(title), score: candidates[title] });
+    }
+  }
+  results.sort(function(a, b) { return b.score - a.score; });
+  return results.slice(0, 5);
+}
+
+function findSong(title) {
+  for (var i = 0; i < SONGS.length; i++) {
+    if (SONGS[i].title === title) return SONGS[i];
+  }
+  return null;
+}
+
+// ============================================================
+//  INTERACT
+// ============================================================
+
+function interact(idx, action) {
+  var song = SONGS[idx];
+  if (!song) return;
+
+  userVec[song.title] = SIGNAL_SCORES[action];
+
+  var now  = new Date();
+  var time = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  eventLog.push({ title: song.title, action: action, score: SIGNAL_SCORES[action], time: time });
+
+  if (action === 'play')        cntPlay++;
+  else if (action === 'skip')   cntSkip++;
+  else if (action === 'replay') cntReplay++;
+
+  var row = document.getElementById('srow-' + idx);
+  if (row) row.classList.add('interacted');
+
+  renderAll();
+}
+
+// ============================================================
+//  GENERATE WRAPPED
+// ============================================================
+
+function generateWrapped() {
+  if (eventLog.length < 5) return;
+
+  var songTotals   = {};
+  var artistCounts = {};
+  var genreCounts  = {};
+
+  for (var e = 0; e < eventLog.length; e++) {
+    var evt  = eventLog[e];
+    var song = findSong(evt.title);
+    if (!song) continue;
+    songTotals[evt.title]      = (songTotals[evt.title]      || 0) + evt.score;
+    artistCounts[song.artist]  = (artistCounts[song.artist]  || 0) + 1;
+    genreCounts[song.genre]    = (genreCounts[song.genre]    || 0) + 1;
+  }
+
+  // Top 3 songs
+  var songArr = [];
+  for (var t in songTotals) {
+    songArr.push({ song: findSong(t), score: songTotals[t] });
+  }
+  songArr.sort(function(a, b) { return b.score - a.score; });
+  var topSongs = songArr.slice(0, 3);
+
+  // Top artist
+  var topArtist = topKey(artistCounts);
+
+  // Top genre
+  var topGenre = topKey(genreCounts);
+
+  var taglines = {
+    'Pop':      'You stayed close to the center of the charts this year. When in doubt, you chose the song that worked.',
+    'Hip-Hop':  'Your year was built on rhythm and conviction. You did not skip the verses.',
+    'Indie':    'You kept looking for something a little off the beaten path. You usually found it.',
+    'Indie Pop':'You live somewhere between the charts and the underground, and you like it there.',
+    'R&B':      'You listened with patience. The songs you returned to had something to say.',
+    'Pop Rock': 'You wanted energy and melody in the same track. Most of the time, you got both.'
+  };
+  var tagline = taglines[topGenre] || 'Your listening this year was entirely your own.';
+
+  var topSongsHtml = '';
+  for (var i = 0; i < topSongs.length; i++) {
+    topSongsHtml +=
+      '<div class="wrapped-song-row">' + (i + 1) + '. ' + esc(topSongs[i].song.title) +
+      ' <span>by ' + esc(topSongs[i].song.artist) + '</span></div>';
+  }
+
+  var el = document.getElementById('wrapped-result');
+  el.className = 'wrapped-result visible';
+  el.innerHTML =
+    '<div class="wrapped-heading">Your 2024 Wrapped</div>' +
+
+    '<div class="wrapped-stat">' +
+      '<div class="wrapped-stat-label">Top Songs This Session</div>' +
+      '<div class="wrapped-stat-value">' + topSongsHtml + '</div>' +
+    '</div>' +
+
+    '<div class="wrapped-stat">' +
+      '<div class="wrapped-stat-label">Top Artist</div>' +
+      '<div class="wrapped-stat-value accent">' + esc(topArtist) + '</div>' +
+    '</div>' +
+
+    '<div class="wrapped-stat">' +
+      '<div class="wrapped-stat-label">Top Genre</div>' +
+      '<div class="wrapped-stat-value accent">' + esc(topGenre) + '</div>' +
+    '</div>' +
+
+    '<div class="wrapped-stat">' +
+      '<div class="wrapped-stat-label">Total Interactions</div>' +
+      '<div class="wrapped-stat-value">' + eventLog.length + '</div>' +
+    '</div>' +
+
+    '<div class="wrapped-tagline">' + esc(tagline) + '</div>' +
+    '<div class="wrapped-footnote">This Wrapped was generated from the same implicit signal log that powered your recommendations above. Both features share the same underlying data pipeline.</div>';
+}
+
+function topKey(obj) {
+  var best = null, bestVal = -1;
+  for (var k in obj) {
+    if (obj[k] > bestVal) { bestVal = obj[k]; best = k; }
+  }
+  return best;
+}
+
+// ============================================================
+//  RENDER
+// ============================================================
+
+function renderSongList() {
+  var list = document.getElementById('song-list');
+  list.innerHTML = '';
+  for (var i = 0; i < SONGS.length; i++) {
+    (function(idx) {
+      var song = SONGS[idx];
+      var div  = document.createElement('div');
+      div.className = 'song-item' + (userVec[song.title] !== undefined ? ' interacted' : '');
+      div.id = 'srow-' + idx;
+      div.innerHTML =
+        '<div class="song-info">' +
+          '<div class="song-title">' + esc(song.title) + '</div>' +
+          '<div class="song-meta">'  + esc(song.artist) + '</div>' +
+        '</div>' +
+        '<span class="genre-badge">' + esc(song.genre) + '</span>' +
+        '<div class="song-actions">' +
+          '<button class="btn btn-skip"   onclick="interact(' + idx + ',\'skip\')"  >Skip</button>'   +
+          '<button class="btn btn-play"   onclick="interact(' + idx + ',\'play\')"  >Play</button>'   +
+          '<button class="btn btn-replay" onclick="interact(' + idx + ',\'replay\')">Replay</button>' +
+        '</div>';
+      list.appendChild(div);
+    })(i);
+  }
+}
+
+function renderRecommendations() {
+  var recs   = computeRecommendations();
+  var listEl = document.getElementById('rec-list');
+  var status = document.getElementById('rec-status');
+
+  if (recs.length === 0) {
+    listEl.innerHTML = '<div class="rec-placeholder">Play, skip, or replay songs to see recommendations generated from your behavior.</div>';
+    status.textContent = 'Awaiting signals';
+    return;
+  }
+
+  status.textContent = recs.length + ' recommendation' + (recs.length !== 1 ? 's' : '');
+  var html = '';
+  for (var i = 0; i < recs.length; i++) {
+    var r = recs[i];
+    html +=
+      '<div class="rec-item">' +
+        '<span class="rec-rank">' + (i + 1) + '</span>' +
+        '<div class="rec-info">' +
+          '<div class="rec-title">' + esc(r.song.title)  + '</div>' +
+          '<div class="rec-meta">'  + esc(r.song.artist) + ' &bull; ' + esc(r.song.genre) + '</div>' +
+        '</div>' +
+        '<span class="rec-score">' + r.score.toFixed(3) + '</span>' +
+      '</div>';
+  }
+  listEl.innerHTML = html;
+}
+
+function renderLog() {
+  var el = document.getElementById('data-log');
+  if (eventLog.length === 0) {
+    el.className   = 'log-empty';
+    el.textContent = 'No signals recorded yet.';
+    return;
+  }
+  el.className = 'log-body';
+  var html = '';
+  for (var i = eventLog.length - 1; i >= 0; i--) {
+    var e   = eventLog[i];
+    var cls = 'log-' + e.action;
+    html += '<div><span class="log-ts">[' + e.time + ']</span> <span class="' + cls + '">' +
+      e.action.toUpperCase() + '</span> &mdash; ' + esc(e.title) + ' &rarr; score ' + e.score + '</div>';
+  }
+  el.innerHTML = html;
+}
+
+function renderCounters() {
+  document.getElementById('cnt-play').textContent   = cntPlay;
+  document.getElementById('cnt-skip').textContent   = cntSkip;
+  document.getElementById('cnt-replay').textContent = cntReplay;
+
+  var total = eventLog.length;
+  document.getElementById('interaction-count').textContent =
+    total + ' interaction' + (total !== 1 ? 's' : '');
+
+  var pct = Math.min((total / 5) * 100, 100);
+  document.getElementById('progress-fill').style.width = pct + '%';
+
+  var btn = document.getElementById('btn-wrapped');
+  var txt = document.getElementById('wrapped-progress-text');
+  if (total >= 5) {
+    btn.disabled    = false;
+    txt.textContent = 'Ready. Generate your Wrapped below.';
+  } else {
+    btn.disabled    = true;
+    txt.textContent = total + '/5 interactions to unlock Wrapped';
+  }
+}
+
+function renderAll() {
+  renderRecommendations();
+  renderLog();
+  renderCounters();
+}
+
+// ============================================================
+//  UTILITIES
+// ============================================================
+
+function esc(s) {
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+// ============================================================
+//  INIT
+// ============================================================
+
+renderSongList();
+renderCounters();
+</script>
 </body>
 </html>
