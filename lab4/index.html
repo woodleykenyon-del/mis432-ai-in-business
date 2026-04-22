@@ -1,0 +1,1156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lab 4: Uber Demand Forecasting &amp; Responsible AI &mdash; MIS 432</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #0d0d0d;
+      --surface:  #161616;
+      --surface2: #1e1e1e;
+      --border:   #2a2a2a;
+      --border2:  #333333;
+      --cyan:     #1fbad6;
+      --cyan-dim: rgba(31,186,214,0.12);
+      --cyan-dk:  rgba(31,186,214,0.08);
+      --text:     #f0f0f0;
+      --muted:    #9a9a9a;
+      --subdued:  #555555;
+      --radius:   8px;
+      --font:     'DM Sans', sans-serif;
+      --mono:     'DM Mono', monospace;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      line-height: 1.65;
+      min-height: 100vh;
+    }
+
+    a { color: var(--cyan); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* ── NAV ── */
+    .site-nav {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 1.25rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-brand { font-size: 0.82rem; font-weight: 600; color: var(--muted); letter-spacing: 0.01em; }
+    .nav-back {
+      font-size: 0.8rem;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      transition: color 0.15s;
+    }
+    .nav-back:hover { color: var(--cyan); text-decoration: none; }
+
+    /* ── HERO ── */
+    .hero {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 4rem 1.5rem 3.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .tag {
+      display: inline-block;
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--cyan);
+      background: var(--cyan-dim);
+      padding: 0.22rem 0.7rem;
+      border-radius: 3px;
+      margin-bottom: 1.5rem;
+    }
+    .hero h1 {
+      font-size: clamp(1.9rem, 4vw, 2.75rem);
+      font-weight: 700;
+      line-height: 1.12;
+      letter-spacing: -0.025em;
+      color: #ffffff;
+      margin-bottom: 1rem;
+      max-width: 700px;
+    }
+    .hero-meta {
+      font-size: 0.82rem;
+      color: var(--muted);
+      letter-spacing: 0.02em;
+      margin-bottom: 1.25rem;
+    }
+    .hero-meta span { color: var(--cyan); }
+    .hero-lead {
+      font-size: 1.05rem;
+      color: var(--muted);
+      max-width: 620px;
+      line-height: 1.75;
+    }
+
+    /* ── CONTAINER ── */
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
+
+    /* ── SECTION ── */
+    .section {
+      padding: 3rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .section:last-child { border-bottom: none; }
+    .section-label {
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--subdued);
+      margin-bottom: 0.6rem;
+    }
+    .section-title {
+      font-size: clamp(1.2rem, 2.5vw, 1.6rem);
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: -0.015em;
+      margin-bottom: 1.25rem;
+      line-height: 1.2;
+    }
+    .section-body {
+      color: var(--muted);
+      font-size: 0.96rem;
+      line-height: 1.8;
+      max-width: 680px;
+    }
+    .section-body p + p { margin-top: 1rem; }
+
+    /* ── TWO-COL ── */
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-top: 1.75rem;
+    }
+
+    /* ── CARDS ── */
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+    }
+    .panel-title {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--cyan);
+      margin-bottom: 0.9rem;
+    }
+
+    /* ── SIGNAL PILLS (business problem) ── */
+    .signal-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+      gap: 0.85rem;
+      margin-top: 1.75rem;
+    }
+    .signal-pill {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.1rem 1.25rem;
+    }
+    .signal-pill .icon {
+      font-size: 1.25rem;
+      margin-bottom: 0.5rem;
+    }
+    .signal-pill h3 {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 0.3rem;
+    }
+    .signal-pill p {
+      font-size: 0.78rem;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    /* ── MODEL TAGS ── */
+    .model-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      margin-top: 1.5rem;
+    }
+    .model-tag {
+      background: var(--surface2);
+      border: 1px solid var(--border2);
+      border-radius: 4px;
+      padding: 0.3rem 0.75rem;
+      font-size: 0.78rem;
+      color: var(--muted);
+      font-family: var(--mono);
+    }
+    .model-tag.accent {
+      border-color: var(--cyan);
+      color: var(--cyan);
+      background: var(--cyan-dim);
+    }
+
+    /* ── STYLIZED CHART AREA ── */
+    .chart-area {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin-top: 1.75rem;
+    }
+    .chart-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
+    }
+    .chart-title {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: #fff;
+    }
+    .chart-subtitle {
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-top: 0.15rem;
+    }
+    .chart-legend {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.7rem;
+      color: var(--muted);
+    }
+    .legend-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    /* SVG chart styles */
+    .chart-svg { width: 100%; overflow: visible; }
+    .chart-line { fill: none; stroke-width: 2; }
+    .chart-area-fill { fill-opacity: 0.08; }
+    .chart-dot { r: 3; }
+    .chart-axis { stroke: var(--border2); stroke-width: 1; }
+    .chart-gridline { stroke: var(--border); stroke-width: 1; stroke-dasharray: 4 4; }
+    .chart-label { font-family: var(--mono); font-size: 9px; fill: var(--subdued); }
+    .chart-spike { stroke: var(--cyan); stroke-width: 2.5; stroke-dasharray: none; }
+
+    /* ── FORECAST BLOCK ── */
+    .forecast-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+    .forecast-stat {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+    }
+    .forecast-stat .label {
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.4rem;
+    }
+    .forecast-stat .value {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #fff;
+      font-variant-numeric: tabular-nums;
+      line-height: 1;
+    }
+    .forecast-stat .sub {
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-top: 0.3rem;
+    }
+    .forecast-stat.highlight .value { color: var(--cyan); }
+
+    /* driver table */
+    .driver-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1.5rem;
+      font-size: 0.88rem;
+    }
+    .driver-table th {
+      font-size: 0.66rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--subdued);
+      text-align: left;
+      padding: 0 0 0.6rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .driver-table td {
+      padding: 0.7rem 0;
+      border-bottom: 1px solid var(--border);
+      color: var(--muted);
+    }
+    .driver-table tr:last-child td { border-bottom: none; }
+    .driver-table .val { font-weight: 600; color: #fff; font-variant-numeric: tabular-nums; }
+    .driver-table .val.accent { color: var(--cyan); }
+
+    /* ── MEMO BLOCK ── */
+    .memo {
+      background: var(--surface2);
+      border: 1px solid var(--border2);
+      border-left: 3px solid var(--cyan);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin-top: 1.75rem;
+      font-size: 0.9rem;
+    }
+    .memo-header {
+      font-size: 0.66rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--cyan);
+      margin-bottom: 0.75rem;
+    }
+    .memo p { color: var(--muted); line-height: 1.75; }
+    .memo p + p { margin-top: 0.75rem; }
+    .memo strong { color: #fff; font-weight: 600; }
+
+    /* ── STRESS TEST BARS ── */
+    .stress-table {
+      margin-top: 1.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+    }
+    .stress-row {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem 1.25rem;
+    }
+    .stress-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
+    .stress-assumption {
+      font-size: 0.84rem;
+      color: #fff;
+      font-weight: 500;
+    }
+    .stress-badge {
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.18rem 0.6rem;
+      border-radius: 3px;
+    }
+    .stress-badge.on { background: rgba(31,186,214,0.15); color: var(--cyan); }
+    .stress-badge.fragile { background: rgba(255,180,50,0.12); color: #f5a623; }
+    .stress-bar-track {
+      height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .stress-bar-fill {
+      height: 100%;
+      border-radius: 2px;
+    }
+    .stress-bar-fill.cyan { background: var(--cyan); }
+    .stress-bar-fill.amber { background: #f5a623; }
+    .stress-note {
+      font-size: 0.74rem;
+      color: var(--subdued);
+      margin-top: 0.4rem;
+    }
+
+    /* ── SCENARIO COMPARISON ── */
+    .scenario-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+      margin-top: 1.75rem;
+    }
+    .scenario-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+    }
+    .scenario-card.ok { border-top: 3px solid var(--cyan); }
+    .scenario-card.bad { border-top: 3px solid #e85d5d; }
+    .scenario-icon { font-size: 1.5rem; margin-bottom: 0.6rem; }
+    .scenario-title {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 0.5rem;
+    }
+    .scenario-desc {
+      font-size: 0.82rem;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+    .scenario-verdict {
+      margin-top: 1rem;
+      padding-top: 0.85rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .scenario-card.ok .scenario-verdict { color: var(--cyan); }
+    .scenario-card.bad .scenario-verdict { color: #e85d5d; }
+
+    /* ── DIST SHIFT TIMELINE ── */
+    .shift-steps {
+      margin-top: 1.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+    .shift-step {
+      display: flex;
+      gap: 1.25rem;
+      align-items: flex-start;
+    }
+    .shift-connector {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex-shrink: 0;
+      padding-top: 0.1rem;
+    }
+    .shift-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--border2);
+      flex-shrink: 0;
+    }
+    .shift-dot.active { background: var(--cyan); }
+    .shift-line {
+      width: 1px;
+      flex: 1;
+      background: var(--border);
+      min-height: 28px;
+    }
+    .shift-body {
+      padding-bottom: 1.5rem;
+    }
+    .shift-heading {
+      font-size: 0.84rem;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 0.25rem;
+    }
+    .shift-text {
+      font-size: 0.8rem;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    /* ── DRIVER IMPACT ── */
+    .impact-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+      margin-top: 1.75rem;
+    }
+    .impact-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.4rem;
+    }
+    .impact-label {
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--subdued);
+      margin-bottom: 0.6rem;
+    }
+    .impact-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 0.5rem;
+    }
+    .impact-text {
+      font-size: 0.8rem;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    /* ── REFLECTION CARDS ── */
+    .reflection-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+      margin-top: 1.75rem;
+    }
+    .reflection-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+    }
+    .reflection-step {
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--cyan);
+      margin-bottom: 0.5rem;
+    }
+    .reflection-q {
+      font-size: 0.84rem;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 0.6rem;
+      line-height: 1.4;
+    }
+    .reflection-a {
+      font-size: 0.8rem;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    /* ── CHAIN DIAGRAM ── */
+    .chain {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-top: 1.75rem;
+    }
+    .chain-node {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 0.7rem 1rem;
+      font-size: 0.8rem;
+      color: #fff;
+      font-weight: 500;
+      text-align: center;
+    }
+    .chain-node.accent {
+      border-color: var(--cyan);
+      background: var(--cyan-dim);
+      color: var(--cyan);
+    }
+    .chain-arrow {
+      color: var(--subdued);
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+
+    /* ── FOOTER ── */
+    .site-footer {
+      max-width: 1000px;
+      margin: 3rem auto 0;
+      padding: 1.75rem 1.5rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.78rem;
+      color: var(--subdued);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 640px) {
+      .two-col { grid-template-columns: 1fr; }
+      .scenario-grid { grid-template-columns: 1fr; }
+      .impact-grid { grid-template-columns: 1fr; }
+      .reflection-grid { grid-template-columns: 1fr; }
+      .chain { flex-direction: column; align-items: flex-start; }
+      .site-nav { flex-direction: column; align-items: flex-start; gap: 0.35rem; }
+      .site-footer { flex-direction: column; }
+      .forecast-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="site-nav">
+  <span class="nav-brand">MIS 432 &mdash; AI in Business</span>
+  <a class="nav-back" href="../index.html">&#8592; Portfolio</a>
+</nav>
+
+<!-- ============================================================
+     HERO
+     ============================================================ -->
+<header class="hero">
+  <div class="tag">Lab 4</div>
+  <h1>Uber Demand Forecasting, Surge Pricing, and Responsible AI</h1>
+  <p class="hero-meta">
+    <span>MIS 432: AI in Business</span> &nbsp;&middot;&nbsp; Western Washington University &nbsp;&middot;&nbsp; Kenyon Woodley
+  </p>
+  <p class="hero-lead">
+    Demand forecasting is the foundation of Uber's operating model: without a reliable picture of where riders will be and when, every downstream decision &mdash; driver positioning, pricing, and wait times &mdash; is built on guesswork.
+  </p>
+</header>
+
+<div class="container">
+
+  <!-- ============================================================
+       1. THE BUSINESS PROBLEM
+       ============================================================ -->
+  <div class="section">
+    <div class="section-label">Section 01</div>
+    <div class="section-title">The Business Problem</div>
+    <div class="section-body">
+      <p>Uber does not just move cars around a city reactively. It tries to position supply before demand arrives. That requires a forecasting layer that is always running in the background, estimating where riders will need pickups and when those moments will happen.</p>
+      <p>Without forecasting, the platform is permanently behind. Drivers end up in the wrong places, wait times climb, riders cancel, and the pricing model reacts to shortages rather than preventing them. The result is worse outcomes for everyone and lower platform efficiency.</p>
+    </div>
+
+    <div class="signal-grid">
+      <div class="signal-pill">
+        <div class="icon">&#128200;</div>
+        <h3>Anticipate Demand</h3>
+        <p>Know where riders will be before they open the app, not after the surge has already started.</p>
+      </div>
+      <div class="signal-pill">
+        <div class="icon">&#128663;</div>
+        <h3>Position Drivers</h3>
+        <p>Send drivers to high-demand zones before the rush so supply is in place when the requests hit.</p>
+      </div>
+      <div class="signal-pill">
+        <div class="icon">&#128178;</div>
+        <h3>Influence Pricing</h3>
+        <p>Use predicted scarcity to set surge multipliers that attract drivers and dampen excess demand.</p>
+      </div>
+      <div class="signal-pill">
+        <div class="icon">&#9201;</div>
+        <h3>Manage Wait Times</h3>
+        <p>Keep expected wait times short enough that riders stay on the platform instead of walking away.</p>
+      </div>
+      <div class="signal-pill">
+        <div class="icon">&#9889;</div>
+        <h3>Decide in Advance</h3>
+        <p>The best operational decisions happen before the rush, not in the middle of it. Forecasting buys that window.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       2. THE DATA AND THE MODEL
+       ============================================================ -->
+  <div class="section">
+    <div class="section-label">Section 02</div>
+    <div class="section-title">The Data and the Model</div>
+    <div class="section-body">
+      <p>This lab built a simple forecasting workflow around Friday-night Uber demand near Western Washington University. The data spanned two academic years of weekly Friday-night trip counts, which meant the model had to learn not just that demand was growing over time, but that it was shaped by recurring calendar patterns layered on top of that trend.</p>
+    </div>
+
+    <div class="model-tags">
+      <span class="model-tag accent">Linear Regression</span>
+      <span class="model-tag">Trend</span>
+      <span class="model-tag">Seasonality</span>
+      <span class="model-tag">School-Year Effect</span>
+      <span class="model-tag">NYE Spike</span>
+      <span class="model-tag">Backtesting</span>
+      <span class="model-tag">Prediction Interval</span>
+    </div>
+
+    <!-- Demand History Chart -->
+    <div class="chart-area" style="margin-top:1.75rem;">
+      <div class="chart-header">
+        <div>
+          <div class="chart-title">Friday-Night Trip Demand Near WWU</div>
+          <div class="chart-subtitle">Two years of weekly history &mdash; illustrative model</div>
+        </div>
+        <div class="chart-legend">
+          <div class="legend-item">
+            <div class="legend-dot" style="background:#1fbad6;"></div>
+            Actual trips
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot" style="background:#ffffff;opacity:0.3;"></div>
+            Model fit
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot" style="background:#f5a623;"></div>
+            NYE spike
+          </div>
+        </div>
+      </div>
+      <svg class="chart-svg" viewBox="0 0 820 180" xmlns="http://www.w3.org/2000/svg">
+        <!-- Grid lines -->
+        <line class="chart-gridline" x1="0" y1="150" x2="820" y2="150"/>
+        <line class="chart-gridline" x1="0" y1="112" x2="820" y2="112"/>
+        <line class="chart-gridline" x1="0" y1="74" x2="820" y2="74"/>
+        <line class="chart-gridline" x1="0" y1="36" x2="820" y2="36"/>
+        <!-- Y axis labels -->
+        <text class="chart-label" x="0" y="154">100</text>
+        <text class="chart-label" x="0" y="116">200</text>
+        <text class="chart-label" x="0" y="78">300</text>
+        <text class="chart-label" x="0" y="40">400</text>
+        <!-- Confidence band (school year periods shaded) -->
+        <rect x="28" y="36" width="130" height="114" fill="#1fbad6" fill-opacity="0.04" rx="2"/>
+        <rect x="230" y="36" width="160" height="114" fill="#1fbad6" fill-opacity="0.04" rx="2"/>
+        <rect x="470" y="36" width="130" height="114" fill="#1fbad6" fill-opacity="0.04" rx="2"/>
+        <rect x="672" y="36" width="130" height="114" fill="#1fbad6" fill-opacity="0.04" rx="2"/>
+        <!-- School year labels -->
+        <text class="chart-label" x="55" y="28" fill="#1fbad6" fill-opacity="0.6">Fall/Winter</text>
+        <text class="chart-label" x="270" y="28" fill="#1fbad6" fill-opacity="0.6">Fall/Winter</text>
+        <text class="chart-label" x="499" y="28" fill="#1fbad6" fill-opacity="0.6">Fall/Winter</text>
+        <text class="chart-label" x="703" y="28" fill="#1fbad6" fill-opacity="0.6">Fall/Winter</text>
+        <!-- Model fit line (smooth trend) -->
+        <polyline class="chart-line" stroke="#ffffff" stroke-opacity="0.22" stroke-dasharray="5 3"
+          points="28,130 80,122 120,118 158,132 200,140 230,126 270,112 310,108 360,120 390,128 430,134 470,115 510,100 550,94 590,112 630,120 660,128 672,110 710,95 750,90 780,100 802,108"/>
+        <!-- Actual demand line -->
+        <polyline class="chart-line" stroke="#1fbad6" stroke-width="2"
+          points="28,134 50,128 70,120 90,115 110,108 130,116 158,128 178,140 200,145 230,128 250,116 270,106 290,100 310,95 330,102 360,116 380,128 400,138 430,140 450,128 470,110 490,96 510,88 530,82 550,90 570,102 590,118 610,128 630,138 650,140 660,132 672,106 690,90 710,80 730,76 750,84 770,96 790,106 802,112"/>
+        <!-- NYE spike marker -->
+        <line x1="214" y1="36" x2="214" y2="150" stroke="#f5a623" stroke-width="1.5" stroke-dasharray="3 2"/>
+        <circle cx="214" cy="80" r="4" fill="#f5a623"/>
+        <text class="chart-label" x="216" y="72" fill="#f5a623">NYE</text>
+        <line x1="620" y1="36" x2="620" y2="150" stroke="#f5a623" stroke-width="1.5" stroke-dasharray="3 2"/>
+        <circle cx="620" cy="86" r="4" fill="#f5a623"/>
+        <text class="chart-label" x="622" y="78" fill="#f5a623">NYE</text>
+        <!-- X axis -->
+        <line class="chart-axis" x1="0" y1="150" x2="820" y2="150"/>
+        <text class="chart-label" x="28" y="166">Jan Y1</text>
+        <text class="chart-label" x="190" y="166">Jul Y1</text>
+        <text class="chart-label" x="380" y="166">Jan Y2</text>
+        <text class="chart-label" x="580" y="166">Jul Y2</text>
+        <text class="chart-label" x="760" y="166">Jan Y3</text>
+      </svg>
+    </div>
+
+    <!-- Backtest Chart -->
+    <div class="chart-area" style="margin-top:1.25rem;">
+      <div class="chart-header">
+        <div>
+          <div class="chart-title">Backtest: Predicted vs. Actual (Hold-out Period)</div>
+          <div class="chart-subtitle">Last 8 months withheld for out-of-sample validation</div>
+        </div>
+        <div class="chart-legend">
+          <div class="legend-item">
+            <div class="legend-dot" style="background:#1fbad6;"></div>
+            Actual
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot" style="background:#ffffff;opacity:0.4;"></div>
+            Predicted
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot" style="background:#1fbad6;opacity:0.15;border-radius:0;width:14px;height:8px;"></div>
+            95% interval
+          </div>
+        </div>
+      </div>
+      <svg class="chart-svg" viewBox="0 0 820 160" xmlns="http://www.w3.org/2000/svg">
+        <!-- Grid -->
+        <line class="chart-gridline" x1="0" y1="130" x2="820" y2="130"/>
+        <line class="chart-gridline" x1="0" y1="97" x2="820" y2="97"/>
+        <line class="chart-gridline" x1="0" y1="64" x2="820" y2="64"/>
+        <line class="chart-gridline" x1="0" y1="31" x2="820" y2="31"/>
+        <!-- Y axis labels -->
+        <text class="chart-label" x="0" y="133">200</text>
+        <text class="chart-label" x="0" y="100">280</text>
+        <text class="chart-label" x="0" y="67">360</text>
+        <text class="chart-label" x="0" y="34">440</text>
+        <!-- Prediction interval band -->
+        <polygon
+          points="28,60 115,58 200,62 290,68 390,74 490,78 600,70 720,64 820,60  820,90 720,94 600,100 490,108 390,104 290,98 200,92 115,88 28,90"
+          fill="#1fbad6" fill-opacity="0.1"/>
+        <!-- Predicted line (smooth) -->
+        <polyline class="chart-line" stroke="#ffffff" stroke-opacity="0.35" stroke-dasharray="5 3"
+          points="28,75 115,72 200,76 290,82 390,88 490,92 600,84 720,78 820,74"/>
+        <!-- Actual line -->
+        <polyline class="chart-line" stroke="#1fbad6" stroke-width="2"
+          points="28,82 115,60 200,70 290,78 390,80 490,86 600,72 720,66 820,68"/>
+        <!-- Backtest miss highlight (early fall) -->
+        <rect x="85" y="50" width="55" height="40" fill="#f5a623" fill-opacity="0.07" rx="2"/>
+        <text class="chart-label" x="88" y="46" fill="#f5a623">Missed ramp-up</text>
+        <!-- X axis -->
+        <line class="chart-axis" x1="0" y1="130" x2="820" y2="130"/>
+        <text class="chart-label" x="10" y="146">Sep</text>
+        <text class="chart-label" x="100" y="146">Oct</text>
+        <text class="chart-label" x="190" y="146">Nov</text>
+        <text class="chart-label" x="280" y="146">Dec</text>
+        <text class="chart-label" x="380" y="146">Jan</text>
+        <text class="chart-label" x="480" y="146">Feb</text>
+        <text class="chart-label" x="590" y="146">Mar</text>
+        <text class="chart-label" x="710" y="146">Apr</text>
+        <text class="chart-label" x="800" y="146">May</text>
+      </svg>
+    </div>
+
+    <div class="section-body" style="margin-top:1.5rem;">
+      <p>One noticeable miss showed up early in the fall. The model picked up the school-year effect in general but treated it too smoothly, missing how sharply demand ramped once students were fully back and Friday-night activity picked up again. That kind of error is less a coding problem and more a reminder that simple models compress real behavior into a few broad signals.</p>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       3. THE CONCERT-NIGHT FORECAST
+       ============================================================ -->
+  <div class="section">
+    <div class="section-label">Section 03</div>
+    <div class="section-title">The Concert-Night Forecast</div>
+    <div class="section-body">
+      <p>The task was to forecast demand for a specific Friday night near WWU when a sold-out concert was happening. The model produced a point estimate and prediction interval, which then translated into an operational driver recommendation.</p>
+    </div>
+
+    <div class="forecast-grid">
+      <div class="forecast-stat highlight">
+        <div class="label">Predicted Trips</div>
+        <div class="value">352</div>
+        <div class="sub">Friday-night forecast</div>
+      </div>
+      <div class="forecast-stat">
+        <div class="label">Prediction Range</div>
+        <div class="value" style="font-size:1.15rem;line-height:1.3;">299&ndash;405</div>
+        <div class="sub">95% interval</div>
+      </div>
+      <div class="forecast-stat">
+        <div class="label">Typical Drivers</div>
+        <div class="value">25</div>
+        <div class="sub">Normal Friday baseline</div>
+      </div>
+      <div class="forecast-stat highlight">
+        <div class="label">Surge Call</div>
+        <div class="value" style="font-size:1.3rem;">YES</div>
+        <div class="sub">Supply far below demand</div>
+      </div>
+    </div>
+
+    <table class="driver-table" style="margin-top:1.75rem;">
+      <thead>
+        <tr>
+          <th>Scenario</th>
+          <th>Trips</th>
+          <th>Drivers Needed</th>
+          <th>Gap vs. Baseline</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Lower bound</td>
+          <td class="val">299</td>
+          <td class="val">~100</td>
+          <td class="val" style="color:#f5a623;">+75 drivers</td>
+        </tr>
+        <tr>
+          <td>Predicted (midpoint)</td>
+          <td class="val">352</td>
+          <td class="val">~118</td>
+          <td class="val" style="color:#f5a623;">+93 drivers</td>
+        </tr>
+        <tr>
+          <td>Upper bound</td>
+          <td class="val">405</td>
+          <td class="val accent">~135</td>
+          <td class="val" style="color:#e85d5d;">+110 drivers</td>
+        </tr>
+      </tbody>
+    </table>
+    <p style="font-size:0.72rem;color:var(--subdued);margin-top:0.5rem;">Assumes approximately 3 trips per driver per hour.</p>
+
+    <div class="memo">
+      <div class="memo-header">Operations Memo &mdash; Concert Night Recommendation</div>
+      <p>
+        The model predicts <strong>352 Friday-night trips</strong> near campus, with a range of <strong>299 to 405</strong>.
+        At a rate of 3 trips per driver per hour, driver need falls between 100 and 135 &mdash; against a baseline of
+        <strong>25 drivers typically online</strong>. The gap is large under every scenario.
+      </p>
+      <p>
+        <strong>Recommendation:</strong> Target approximately 135 drivers near campus at 10pm and activate surge pricing.
+        Plan around the upper bound, not the midpoint, because concert crowds tend to concentrate demand in a short window after the show ends.
+        If the post-show rush is more intense than a normal Friday, actual need could land above even the upper range.
+      </p>
+      <p>
+        The assumption that concerns me most is that the concert crowd behaves like a normal Friday crowd.
+        A sold-out show ending at 10pm creates a much more concentrated wave than the model was trained on.
+        Treat this as a planning floor, not a ceiling.
+      </p>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       4. STRESS-TESTING
+       ============================================================ -->
+  <div class="section">
+    <div class="section-label">Section 04</div>
+    <div class="section-title">Stress-Testing the Recommendation</div>
+    <div class="section-body">
+      <p>Before committing to the memo, the assumptions behind the forecast were stress-tested. The surge call held across most reasonable scenarios. But the recommendation turned fragile when driver supply assumptions were challenged.</p>
+      <p>The baseline already implies a serious supply shortfall. What the stress test revealed is that even a good demand forecast becomes operationally weak if drivers simply do not show up in the numbers the model assumes. The real risk on Friday night is not predicting demand wrong &mdash; it is assuming supply will respond the way the platform expects.</p>
+    </div>
+
+    <div class="stress-table">
+      <div class="stress-row">
+        <div class="stress-top">
+          <span class="stress-assumption">Demand runs 10% lower than predicted</span>
+          <span class="stress-badge on">Surge: Still ON</span>
+        </div>
+        <div class="stress-bar-track"><div class="stress-bar-fill cyan" style="width:90%;"></div></div>
+        <div class="stress-note">Even at 317 trips, driver need (~106) still far exceeds 25 baseline drivers.</div>
+      </div>
+      <div class="stress-row">
+        <div class="stress-top">
+          <span class="stress-assumption">Demand runs 20% higher than predicted</span>
+          <span class="stress-badge on">Surge: Still ON</span>
+        </div>
+        <div class="stress-bar-track"><div class="stress-bar-fill cyan" style="width:100%;"></div></div>
+        <div class="stress-note">At 422 trips, driver need climbs to ~141. Surge is even more necessary.</div>
+      </div>
+      <div class="stress-row">
+        <div class="stress-top">
+          <span class="stress-assumption">Drivers complete 4 trips/hour (more efficient)</span>
+          <span class="stress-badge on">Surge: Still ON</span>
+        </div>
+        <div class="stress-bar-track"><div class="stress-bar-fill cyan" style="width:78%;"></div></div>
+        <div class="stress-note">Driver need drops to ~88, still well above baseline. Surge still justified.</div>
+      </div>
+      <div class="stress-row">
+        <div class="stress-top">
+          <span class="stress-assumption">Driver availability is 40% lower than expected</span>
+          <span class="stress-badge fragile">Surge: Fragile</span>
+        </div>
+        <div class="stress-bar-track"><div class="stress-bar-fill amber" style="width:45%;"></div></div>
+        <div class="stress-note">Supply shortfall worsens dramatically. Forecast accuracy no longer the binding constraint &mdash; supply response is.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       5. THE ALGORITHM DECIDES
+       ============================================================ -->
+  <div class="section">
+    <div class="section-label">Section 05</div>
+    <div class="section-title">The Algorithm Decides</div>
+    <div class="section-body">
+      <p>Uber does not employ someone to read each forecast and decide whether to trigger surge pricing. The prediction feeds directly into a multiplier. No human reviews every decision. The forecast becomes the fare.</p>
+      <p>This is efficient when context is normal. When a routine Friday night produces more demand than supply, automated surge works exactly as intended. But when context changes, the same logic produces outcomes that feel very different to the people affected by them.</p>
+    </div>
+
+    <div class="scenario-grid">
+      <div class="scenario-card ok">
+        <div class="scenario-icon">&#127926;</div>
+        <div class="scenario-title">Concert Ends at 10pm</div>
+        <div class="scenario-desc">Demand spikes near the venue. Supply is short. Surge pricing rises to attract drivers and clear the queue. Riders who need a ride pay more; drivers earn more. The market corrects itself over the next 20 minutes.</div>
+        <div class="scenario-verdict">Automatic surge feels appropriate &mdash; market logic applies.</div>
+      </div>
+      <div class="scenario-card bad">
+        <div class="scenario-icon">&#127755;</div>
+        <div class="scenario-title">Earthquake Hits the City</div>
+        <div class="scenario-desc">Demand spikes near affected areas. Supply is short. The same algorithm fires the same surge multiplier. Riders trying to evacuate or reach family members face 8x fares. The system cannot distinguish between a concert and a disaster.</div>
+        <div class="scenario-verdict">Same logic, unacceptable outcome &mdash; context changes everything.</div>
+      </div>
+    </div>
+
+    <div class="memo" style="margin-top:1.75rem;">
+      <div class="memo-header">Governance Rule &mdash; Emergency Surge Override</div>
+      <p>
+        If emergency-event signals are detected from public safety feeds, local alerts, or an internal incident flag,
+        automatic surge pricing must pause immediately.
+        <strong>Any multiplier above base pricing must require human approval before it is shown to riders.</strong>
+        This rule is specific enough to implement as a code check and clear enough to support a formal governance policy.
+      </p>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       6. DISTRIBUTION SHIFT
+       ============================================================ -->
+  <div class="section">
+    <div class="section-label">Section 06</div>
+    <div class="section-title">Distribution Shift: When the World Changes and the Model Does Not</div>
+    <div class="section-body">
+      <p>The Bellingham scenario: Lyft enters the market. Some Uber drivers quietly start splitting their time. The model does not know this. It is still forecasting supply response based on conditions from before Lyft arrived.</p>
+    </div>
+
+    <div class="shift-steps">
+      <div class="shift-step">
+        <div class="shift-connector"><div class="shift-dot active"></div><div class="shift-line"></div></div>
+        <div class="shift-body">
+          <div class="shift-heading">Lyft enters Bellingham</div>
+          <div class="shift-text">Some drivers begin splitting time between platforms. The overall supply available to Uber at any given moment starts declining without any signal in the Uber data.</div>
+        </div>
+      </div>
+      <div class="shift-step">
+        <div class="shift-connector"><div class="shift-dot active"></div><div class="shift-line"></div></div>
+        <div class="shift-body">
+          <div class="shift-heading">The model keeps running on old assumptions</div>
+          <div class="shift-text">Demand forecasts stay accurate. Supply response estimates do not. The model is predicting a city where Uber still has effective control over local driver availability.</div>
+        </div>
+      </div>
+      <div class="shift-step">
+        <div class="shift-connector"><div class="shift-dot active"></div><div class="shift-line"></div></div>
+        <div class="shift-body">
+          <div class="shift-heading">Surge misfires and riders wait longer</div>
+          <div class="shift-text">The algorithm fires surge based on the old supply model. Drivers respond less reliably than expected. Riders wait longer. The system acts confident in decisions that are based on a market that no longer exists.</div>
+        </div>
+      </div>
+      <div class="shift-step">
+        <div class="shift-connector"><div class="shift-dot active"></div><div class="shift-line"></div></div>
+        <div class="shift-body">
+          <div class="shift-heading">Drivers chase outdated demand patterns</div>
+          <div class="shift-text">Positioning recommendations still reflect old demand geography. Drivers following the app end up in the wrong places, earning less than expected and reinforcing the supply shortfall.</div>
+        </div>
+      </div>
+      <div class="shift-step">
+        <div class="shift-connector"><div class="shift-dot"></div></div>
+        <div class="shift-body" style="padding-bottom:0;">
+          <div class="shift-heading">Error rises &mdash; silently</div>
+          <div class="shift-text">Forecast errors compound week over week. Without a monitoring threshold, the model continues running without triggering any review. The bias grows into the next training cycle.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="memo" style="margin-top:1.75rem;">
+      <div class="memo-header">Governance Policy for Distribution Shift</div>
+      <p>
+        An AI governance policy for this model needs <strong>clear ownership</strong>, defined monitoring thresholds,
+        scheduled review of forecast error, and authority for someone to pause or retrain the model when error rises sharply.
+        The accountable person must be close enough to both operations and modeling to recognize what distribution shift looks like
+        in real-world pricing and driver decisions.
+      </p>
+      <p>
+        <strong>The rule:</strong> if forecast error exceeds a defined threshold for a sustained period, the model cannot keep running silently without review.
+      </p>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       7. DRIVER-SIDE IMPACT
+       ============================================================ -->
+  <div class="section">
+    <div class="section-label">Section 07</div>
+    <div class="section-title">What It Feels Like From the Inside</div>
+    <div class="section-body">
+      <p>In the driver simulation, the signal that something was wrong was not one bad number. It was the mismatch between what the app suggested and what earnings and rider outcomes actually looked like. The platform still appeared confident while the logic had already stopped working.</p>
+    </div>
+
+    <div class="impact-grid">
+      <div class="impact-card">
+        <div class="impact-label">The Problem</div>
+        <div class="impact-title">Misaligned Signals</div>
+        <div class="impact-text">Demand signals and multipliers stopped lining up with actual outcomes around round 5. Drivers following the platform's guidance moved toward demand that was no longer concentrated where the algorithm thought it was.</div>
+      </div>
+      <div class="impact-card">
+        <div class="impact-label">The Effect</div>
+        <div class="impact-title">Wasted Movement, Lower Earnings</div>
+        <div class="impact-text">Drivers spent time and fuel repositioning based on outdated signals. Earnings came in below what the multiplier implied. Riders in outer areas like Cordata experienced worse service even though the algorithm was still acting confident.</div>
+      </div>
+      <div class="impact-card">
+        <div class="impact-label">The Trust Problem</div>
+        <div class="impact-title">Algorithms Shape Income</div>
+        <div class="impact-text">The platform is not just recommending routes. It is shaping what drivers earn. If a driver cannot understand why demand signals, multipliers, or payouts are shifting, it becomes rational to stop trusting and responding to the platform.</div>
+      </div>
+      <div class="impact-card">
+        <div class="impact-label">The Feedback Loop</div>
+        <div class="impact-title">Trust Failure Weakens the Model</div>
+        <div class="impact-text">Once driver trust breaks down, supply becomes less predictable. That unpredictability feeds directly back into the forecasting system, because the model becomes less reliable when drivers stop responding predictably to positioning signals.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       8. FINAL ANALYSIS
+       ============================================================ -->
+  <div class="section">
+    <div class="section-label">Section 08</div>
+    <div class="section-title">Final Analysis: Tracing the Full Chain</div>
+    <div class="section-body">
+      <p>The lab traces a single chain from raw data to downstream human impact. Each step adds leverage and each step adds risk. The forecast is not just a number that sits in a notebook &mdash; it closes the prediction-decision gap and shapes what riders pay and what drivers earn.</p>
+    </div>
+
+    <div class="chain">
+      <div class="chain-node">Historical demand data</div>
+      <div class="chain-arrow">&#8594;</div>
+      <div class="chain-node">Trend + seasonality model</div>
+      <div class="chain-arrow">&#8594;</div>
+      <div class="chain-node accent">Forecast: 352 trips</div>
+      <div class="chain-arrow">&#8594;</div>
+      <div class="chain-node">Driver recommendation</div>
+      <div class="chain-arrow">&#8594;</div>
+      <div class="chain-node">Surge multiplier fires</div>
+      <div class="chain-arrow">&#8594;</div>
+      <div class="chain-node">Rider price &amp; driver earnings</div>
+    </div>
+
+    <div class="reflection-grid">
+      <div class="reflection-card">
+        <div class="reflection-step">Step 1 &mdash; Exploration</div>
+        <div class="reflection-q">Why does the school-year effect matter most for the concert forecast?</div>
+        <div class="reflection-a">The concert is happening near campus during the school year, so student presence changes the baseline before the concert spike is even added. If the model misses how much busier campus Fridays are when WWU is in session, it will undershoot demand before accounting for the concert crowd at all. Skipping exploration would have meant missing that near-campus Friday demand behaves differently depending on the academic calendar.</div>
+      </div>
+      <div class="reflection-card">
+        <div class="reflection-step">Step 2 &mdash; Backtesting</div>
+        <div class="reflection-q">Why can you not skip the backtest?</div>
+        <div class="reflection-a">Without a backtest you have no idea whether the model can predict anything reasonable on data it has never seen. The backtest is what tells you whether the model understands the pattern or is just fitting the past in a way that falls apart immediately. Skipping it means you could still produce a forecast number, but you would have no way to know if that number was useful, fragile, or completely misleading.</div>
+      </div>
+      <div class="reflection-card">
+        <div class="reflection-step">Step 3 &mdash; Forecast Output</div>
+        <div class="reflection-q">How would you frame this for your boss?</div>
+        <div class="reflection-a">The forecast is useful, but it should be treated as a planning tool rather than a hard fact. The prediction interval matters here because concert nights are exactly the kind of situation where demand can run hot in a short window. Frame the driver recommendation around the upper bound rather than the midpoint, and make clear that if the post-show rush is more concentrated than normal, actual need could land above even the upper range.</div>
+      </div>
+      <div class="reflection-card">
+        <div class="reflection-step">Step 4 &mdash; Stress Testing</div>
+        <div class="reflection-q">What does the stress test actually reveal?</div>
+        <div class="reflection-a">The surge call stayed on in most reasonable scenarios, which means the baseline forecast already implies real supply pressure. The more revealing finding was that driver availability assumptions had the biggest effect on the recommendation &mdash; bigger than demand level uncertainty. The real risk is not predicting demand wrong. It is assuming supply will show up the way the model expects.</div>
+      </div>
+      <div class="reflection-card">
+        <div class="reflection-step">Step 5 &mdash; Context vs. Algorithm</div>
+        <div class="reflection-q">What actually differs between concert and earthquake?</div>
+        <div class="reflection-a">Not the algorithm. The context. In the concert scenario, surge is doing what it was designed to do in a normal market situation where demand temporarily spikes. In the earthquake scenario, the same logic runs on a public safety problem, and our expectations of what the system should be allowed to do are completely different. The algorithm has no way to know which world it is in.</div>
+      </div>
+      <div class="reflection-card">
+        <div class="reflection-step">Step 6 &mdash; Distribution Shift</div>
+        <div class="reflection-q">What would you add to this system for a real deployment?</div>
+        <div class="reflection-a">A stronger real-time event signal so the model could recognize unusual nights faster, rather than relying entirely on historical patterns. And a monitoring layer with clear ownership &mdash; a specific person accountable for watching forecast error and empowered to pause or retrain the model when something looks wrong. Distribution shift is only dangerous if no one is watching for it.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer class="site-footer">
+  <span>MIS 432: AI in Business &mdash; Western Washington University</span>
+  <span>Kenyon Woodley &nbsp;&middot;&nbsp; <a href="../index.html" style="color:var(--subdued);">Portfolio</a></span>
+</footer>
+
+</body>
+</html>
