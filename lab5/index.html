@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lab 5: Waymo Strategy Analysis &mdash; MIS 432</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:         #f7f8fa;
+      --surface:    #ffffff;
+      --border:     #dde3ec;
+      --accent:     #00BFA5;
+      --accent-dim: rgba(0,191,165,0.1);
+      --text:       #263238;
+      --muted:      #546e7a;
+      --subdued:    #90a4ae;
+      --radius:     8px;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      line-height: 1.65;
+      min-height: 100vh;
+    }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* NAV */
+    .site-nav {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 1.25rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-brand { font-size: 0.82rem; font-weight: 600; color: var(--muted); letter-spacing: 0.01em; }
+    .nav-back {
+      font-size: 0.8rem;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      transition: color 0.15s;
+    }
+    .nav-back:hover { color: var(--accent); text-decoration: none; }
+
+    /* HERO */
+    .hero {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 4rem 1.5rem 3.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .tag {
+      display: inline-block;
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      background: var(--accent-dim);
+      padding: 0.22rem 0.7rem;
+      border-radius: 3px;
+      margin-bottom: 1.5rem;
+    }
+    .hero h1 {
+      font-size: clamp(1.9rem, 4vw, 2.75rem);
+      font-weight: 700;
+      line-height: 1.12;
+      letter-spacing: -0.025em;
+      color: var(--text);
+      margin-bottom: 1rem;
+      max-width: 720px;
+    }
+    .hero-meta {
+      font-size: 0.82rem;
+      color: var(--muted);
+      letter-spacing: 0.02em;
+      margin-bottom: 1.25rem;
+    }
+    .hero-meta span { color: var(--accent); }
+    .hero-lead {
+      font-size: 1.05rem;
+      color: var(--muted);
+      max-width: 620px;
+      line-height: 1.75;
+    }
+
+    /* CONTAINER */
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
+
+    /* SECTION */
+    .section {
+      padding: 3rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .section:last-child { border-bottom: none; }
+    .section-label {
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--subdued);
+      margin-bottom: 0.6rem;
+    }
+    .section-title {
+      font-size: clamp(1.2rem, 2.5vw, 1.6rem);
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.015em;
+      margin-bottom: 1.25rem;
+      line-height: 1.2;
+    }
+    .section-body {
+      color: var(--muted);
+      font-size: 0.96rem;
+      line-height: 1.8;
+      max-width: 680px;
+    }
+    .section-body p + p { margin-top: 1rem; }
+
+    /* SNAPSHOT */
+    .snapshot {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-top: 3px solid var(--accent);
+      border-radius: var(--radius);
+      padding: 1.75rem;
+      margin-top: 1.75rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 1.25rem;
+    }
+    .snap-label {
+      font-size: 0.66rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--subdued);
+      margin-bottom: 0.3rem;
+    }
+    .snap-value {
+      font-size: 0.92rem;
+      font-weight: 600;
+      color: var(--text);
+      line-height: 1.45;
+    }
+    .snap-value.accent { color: var(--accent); }
+
+    /* ARTIFACT */
+    .artifact {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
+      border-radius: var(--radius);
+      padding: 1.75rem;
+      margin-top: 1.75rem;
+      font-size: 0.9rem;
+    }
+    .artifact-header {
+      font-size: 0.66rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 0.85rem;
+    }
+    .artifact p { color: var(--muted); line-height: 1.8; }
+    .artifact p + p { margin-top: 0.85rem; }
+    .artifact strong { color: var(--text); font-weight: 600; }
+    .artifact-footer {
+      margin-top: 1.1rem;
+      padding-top: 0.85rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.74rem;
+      color: var(--subdued);
+      font-style: italic;
+    }
+
+    /* DATASET CARDS */
+    .dataset-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-top: 1.75rem;
+    }
+    .dataset-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.4rem;
+    }
+    .dataset-card.selected {
+      border-color: var(--accent);
+      border-top: 3px solid var(--accent);
+    }
+    .dataset-card-label {
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--subdued);
+      margin-bottom: 0.4rem;
+    }
+    .dataset-card.selected .dataset-card-label { color: var(--accent); }
+    .dataset-name {
+      font-size: 0.96rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 0.25rem;
+    }
+    .dataset-cost {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 0.65rem;
+    }
+    .dataset-desc {
+      font-size: 0.8rem;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+    .dataset-badge {
+      display: inline-block;
+      margin-top: 0.85rem;
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.2rem 0.65rem;
+      border-radius: 3px;
+      background: var(--accent-dim);
+      color: var(--accent);
+    }
+
+    /* REWARD GRID */
+    .reward-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+      gap: 1rem;
+      margin-top: 1.75rem;
+    }
+    .reward-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+    }
+    .r-label {
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--subdued);
+      margin-bottom: 0.35rem;
+    }
+    .r-value {
+      font-size: 1.65rem;
+      font-weight: 700;
+      line-height: 1;
+      margin-bottom: 0.3rem;
+    }
+    .r-value.pos { color: var(--accent); }
+    .r-value.neg { color: #e53935; }
+    .r-desc {
+      font-size: 0.77rem;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    /* RESULTS ROW */
+    .results-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-top: 1.75rem;
+    }
+    .result-stat {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+      text-align: center;
+    }
+    .rs-val {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: var(--accent);
+      line-height: 1;
+      margin-bottom: 0.35rem;
+    }
+    .rs-sub {
+      font-size: 0.75rem;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    /* BUDGET BARS */
+    .budget-list {
+      margin-top: 1.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+      max-width: 540px;
+    }
+    .budget-top {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.3rem;
+      font-size: 0.86rem;
+    }
+    .budget-name { font-weight: 500; color: var(--text); }
+    .budget-pct { font-weight: 700; color: var(--accent); }
+    .budget-track {
+      height: 6px;
+      background: var(--border);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .budget-fill {
+      height: 100%;
+      background: var(--accent);
+      border-radius: 3px;
+    }
+
+    /* CITY CARDS */
+    .city-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 1rem;
+      margin-top: 1.75rem;
+    }
+    .city-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.4rem;
+    }
+    .city-card.selected {
+      border-color: var(--accent);
+      border-top: 3px solid var(--accent);
+    }
+    .city-name {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 0.5rem;
+    }
+    .city-card.selected .city-name { color: var(--accent); }
+    .city-note {
+      font-size: 0.8rem;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+    .city-verdict {
+      margin-top: 0.9rem;
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--subdued);
+    }
+    .city-card.selected .city-verdict { color: var(--accent); }
+
+    /* REFLECTION CARDS */
+    .reflection-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+      margin-top: 1.75rem;
+    }
+    .reflection-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+    }
+    .reflection-step {
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 0.45rem;
+    }
+    .reflection-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 0.5rem;
+      line-height: 1.35;
+    }
+    .reflection-body {
+      font-size: 0.8rem;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    /* CLOSING */
+    .closing-block {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2rem;
+      margin-top: 1.75rem;
+    }
+    .closing-block p {
+      font-size: 0.98rem;
+      color: var(--muted);
+      line-height: 1.8;
+    }
+    .closing-block strong { color: var(--text); }
+
+    /* FOOTER */
+    .site-footer {
+      max-width: 1000px;
+      margin: 3rem auto 0;
+      padding: 1.75rem 1.5rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.78rem;
+      color: var(--subdued);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 700px) {
+      .dataset-grid { grid-template-columns: 1fr; }
+      .results-row { grid-template-columns: 1fr; }
+      .reflection-grid { grid-template-columns: 1fr; }
+      .reward-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 500px) {
+      .site-nav { flex-direction: column; align-items: flex-start; gap: 0.35rem; }
+      .site-footer { flex-direction: column; }
+      .snapshot { grid-template-columns: 1fr; }
+      .reward-grid { grid-template-columns: 1fr; }
+      .city-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="site-nav">
+  <span class="nav-brand">MIS 432 &mdash; AI in Business</span>
+  <a class="nav-back" href="../index.html">&#8592; Portfolio</a>
+</nav>
+
+<!-- ============================================================
+     HERO
+     ============================================================ -->
+<header class="hero">
+  <div class="tag">Lab 5</div>
+  <h1>Waymo Strategy Analysis: A Case Study in Applied AI Decision-Making</h1>
+  <p class="hero-meta">
+    <span>MIS 432: AI in Business</span> &nbsp;&middot;&nbsp; Western Washington University &nbsp;&middot;&nbsp; Kenyon Woodley
+  </p>
+  <p class="hero-lead">
+    This project simulates the role of a Waymo strategy analyst evaluating perception, world models, reinforcement learning, data strategy, and launch-market selection.
+  </p>
+</header>
+
+<div class="container">
+
+  <!-- ============================================================
+       SITUATION
+       ============================================================ -->
+  <div class="section">
+    <div class="section-label">The Situation</div>
+    <div class="section-title">A Two-Star Trip and a Big Strategic Question</div>
+    <div class="section-body">
+      <p>Two weeks ago in Austin, Texas, a Waymo car hesitated for 14 seconds at an unprotected left turn. There was no safety incident, but the rider gave the trip 2 stars and posted about it. Engineering described it as both a perception problem and a planner problem.</p>
+      <p>The VP of Strategy asked for a recommendation on whether Waymo is ready to expand to a fifth city and where that launch should happen next. This project works through the technical and strategic evidence behind that decision.</p>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       EXECUTIVE SNAPSHOT
+       ============================================================ -->
+  <div class="section">
+    <div class="section-label">Executive Snapshot</div>
+    <div class="section-title">Decisions at a Glance</div>
+    <div class="section-body">
+      <p>A short summary of each recommendation before the supporting analysis.</p>
+    </div>
+    <div class="snapshot">
+      <div>
+        <div class="snap-label">Dataset Choice</div>
+        <div class="snap-value accent">Dataset C, Edge-Case Heavy</div>
+      </div>
+      <div>
+        <div class="snap-label">World Model Stance</div>
+        <div class="snap-value">Double down on targeted simulation</div>
+      </div>
+      <div>
+        <div class="snap-label">Reward Function</div>
+        <div class="snap-value">Safety-first balanced planner</div>
+      </div>
+      <div>
+        <div class="snap-label">Data Budget</div>
+        <div class="snap-value">35% simulation, 20% fleet, 20% labelers, 15% sensors, 10% partnerships</div>
+      </div>
+      <div>
+        <div class="snap-label">City Recommendation</div>
+        <div class="snap-value accent">Seattle</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       STEP 1: DEEP LEARNING BASICS
+       ============================================================ -->
+  <div class="section">
+    <div class="section-label">Step 01</div>
+    <div class="section-title">Deep Learning Basics</div>
+    <div class="section-body">
+      <p>I trained a small neural network by labeling images as cat or not cat and watched the network's feature weights shift as it learned. I then studied how a CNN processes an image in layers, moving from raw pixels, to edges, to shapes, to object classification. Finally, I looked at the long-tail problem in driving, where common scenarios dominate the data but rare scenarios create the biggest safety failures.</p>
+      <p>Deep learning is a way for a computer to learn patterns from examples. A neural network is a web of simple decision points that slowly adjusts itself as it sees more data. It is called "deep" because there are many layers, and each layer learns a slightly more complex version of the pattern. It learns by making guesses, seeing whether it was right or wrong, and adjusting until it gets better over time.</p>
+    </div>
+
+    <div class="artifact">
+      <div class="artifact-header">Reflection -- Medical Imaging AI</div>
+      <p>The single question I would ask is: how well does the model perform on patients outside the Boston hospital system, especially patients from rural Kentucky? The 94% accuracy number sounds strong, but if nearly all of the training data came from one hospital system, the model may have learned patterns tied to that population, equipment, imaging standards, or documentation process. Before approving the deal, I would want evidence that the model generalizes to the actual hospitals where it will be deployed.</p>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       STEP 2: DEEP LEARNING AT WAYMO
+       ============================================================ -->
+  <div class="section">
+    <div class="section-label">Step 02</div>
+    <div class="section-title">Deep Learning at Waymo: Dataset Selection</div>
+    <div class="section-body">
+      <p>I evaluated three dataset strategies for Waymo's perception model. The core question was where to invest a limited budget when common driving conditions are already well-covered by the existing training set.</p>
+    </div>
+
+    <div class="dataset-grid">
+      <div class="dataset-card">
+        <div class="dataset-card-label">Option A</div>
+        <div class="dataset-name">Easy Miles</div>
+        <div class="dataset-cost">$100M</div>
+        <div class="dataset-desc">Mostly sunny Phoenix daylight frames. Common conditions, lowest cost. Does not add meaningful capability where the model already performs well.</div>
+      </div>
+      <div class="dataset-card">
+        <div class="dataset-card-label">Option B</div>
+        <div class="dataset-name">Balanced</div>
+        <div class="dataset-cost">$180M</div>
+        <div class="dataset-desc">Varied common conditions. Broader coverage than A, but still weighted toward scenarios the model handles reasonably. Reduces some weaknesses without targeting the real risk.</div>
+      </div>
+      <div class="dataset-card selected">
+        <div class="dataset-card-label">Option C -- Selected</div>
+        <div class="dataset-name">Edge-Case Heavy</div>
+        <div class="dataset-cost">$300M</div>
+        <div class="dataset-desc">Rare scenarios including night rain, unusual pedestrians, construction zones, and oddly parked vehicles. Targets the cases most likely to damage Waymo's safety record and slow expansion.</div>
+        <div class="dataset-badge">Recommended</div>
+      </div>
+    </div>
+
+    <div class="artifact">
+      <div class="artifact-header">Internal Email -- Perception Dataset Recommendation</div>
+      <p><strong>Subject: Recommendation to fund Dataset C for perception training</strong></p>
+      <p>I recommend we fund Dataset C: Edge-Case Heavy.</p>
+      <p>The reason is simple: Waymo's real risk is not routine sunny driving. Our perception system already performs well in common conditions. The business risk lives in the long tail: night rain, unusual pedestrians, construction zones, oddly parked vehicles, and other rare scenarios that become safety, legal, and public-trust problems when the model fails.</p>
+      <p>Dataset C is expensive, but it directly targets the cases most likely to damage our safety record and slow city expansion. It also strengthens our long-term competitive position because rare-scenario coverage is harder for competitors to copy than basic driving data.</p>
+      <p>The tradeoff is that we are accepting higher cost and slower collection. I think that is the right tradeoff because for Waymo, the cheapest dataset could become the most expensive mistake.</p>
+      <div class="artifact-footer">Drafted with Claude and edited for voice and accuracy.</div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       STEP 3: WORLD MODELS
+       ============================================================ -->
+  <div class="section">
+    <div class="section-label">Step 03</div>
+    <div class="section-title">World Models: Manufacturing the Long Tail</div>
+    <div class="section-body">
+      <p>World models solve the long-tail problem by generating rare scenarios on demand rather than waiting for the real world to produce them. I built three rare scenarios in the simulator, including one combining night rain, a wheelchair user partially hidden behind a delivery truck, and active construction lighting. Encountering those combinations naturally would require roughly 86 million miles of real-world driving. The world model generated them by composing ingredients it understood separately.</p>
+    </div>
+
+    <div class="artifact">
+      <div class="artifact-header">Internal Brief -- World Model Investment Strategy</div>
+      <p>Fleet driving gives us volume, but it cannot reliably generate the exact rare cases we need most. In my simulator work, I built three rare scenarios, including night rain with a wheelchair user partially hidden behind a delivery truck. Encountering those combinations naturally would require roughly 86 million miles of real-world driving. The world model generated them on demand in seconds by composing ingredients it already understood separately.</p>
+      <p>Tesla's fleet volume is a real advantage for common driving patterns. But for the long tail, volume alone is not enough. A rare scenario can still be invisible even inside a huge fleet if the exact combination barely occurs. Waymo's simulation strategy lets us target weakness directly, train against it repeatedly, and improve before the vehicle meets that case on a public road.</p>
+      <p>If we stop investing in simulation, we lose our ability to manufacture the edge cases that define safety leadership.</p>
+      <p><strong>World model investment is a strategic moat, not just an engineering cost.</strong></p>
+      <div class="artifact-footer">Drafted with Claude and edited for voice and accuracy.</div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       STEP 4: REINFORCEMENT LEARNING
+       ============================================================ -->
+  <div class="section">
+    <div class="section-label">Step 04</div>
+    <div class="section-title">Planning with Reinforcement Learning</div>
+    <div class="section-body">
+      <p>I designed a reward function to address the Austin-style left-turn hesitation. The goal was a policy that improves turn completion and rider experience without pushing the planner into a risk profile that would be hard to defend after a public incident.</p>
+    </div>
+
+    <div class="reward-grid">
+      <div class="reward-item">
+        <div class="r-label">Turn Completion</div>
+        <div class="r-value pos">+8</div>
+        <div class="r-desc">Reward for successfully completing an unprotected left turn.</div>
+      </div>
+      <div class="reward-item">
+        <div class="r-label">Collision Penalty</div>
+        <div class="r-value neg">-9</div>
+        <div class="r-desc">Highest penalty. Safety is the non-negotiable constraint.</div>
+      </div>
+      <div class="reward-item">
+        <div class="r-label">Close Call Penalty</div>
+        <div class="r-value neg">-7</div>
+        <div class="r-desc">Strong penalty for near misses. Protects public trust and legal exposure.</div>
+      </div>
+      <div class="reward-item">
+        <div class="r-label">Wait Penalty (per second)</div>
+        <div class="r-value neg">-4</div>
+        <div class="r-desc">Per-second penalty to directly address the Austin hesitation failure.</div>
+      </div>
+    </div>
+
+    <div class="results-row">
+      <div class="result-stat">
+        <div class="rs-val">287/300</div>
+        <div class="rs-sub">Successful turns<br/>Threshold: at least 285</div>
+      </div>
+      <div class="result-stat">
+        <div class="rs-val">1</div>
+        <div class="rs-sub">Collision<br/>Threshold: no more than 1</div>
+      </div>
+      <div class="result-stat">
+        <div class="rs-val">7.6s</div>
+        <div class="rs-sub">Average wait<br/>Threshold: under 8 seconds</div>
+      </div>
+    </div>
+
+    <div class="artifact">
+      <div class="artifact-header">Safety Board Defense -- Reward Function Rationale</div>
+      <p>For the Austin-style unprotected left turn, I recommend a reward function with +8 for completing a turn, a 9-point collision penalty, a 7-point close-call penalty, and a 4-point wait penalty per second. On the 300-attempt test set, this policy produced 287 successful turns, 1 collision, and a 7.6-second average wait, which clears all three safety-board thresholds: at least 285 completions, no more than 1 collision, and average wait under 8 seconds.</p>
+      <p>The tradeoff is deliberate. I weighted collision and close calls most heavily because safety and public trust remain the non-negotiables, but I still assigned enough penalty to waiting to directly address the Austin hesitation failure. This is not the most aggressive policy, but it is a defensible one: it improves completion and rider experience without pushing the planner into a risk profile I would not want to defend after a public incident.</p>
+      <div class="artifact-footer">Drafted with Claude and edited for voice and accuracy.</div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       STEP 5: DATA STRATEGY
+       ============================================================ -->
+  <div class="section">
+    <div class="section-label">Step 05</div>
+    <div class="section-title">Data Strategy: Building a Moat</div>
+    <div class="section-body">
+      <p>I allocated Waymo's $1B data budget across five categories. The logic was to protect the compounding loop: real-world miles surface new scenarios, simulation generates targeted variations, labelers annotate both, sensors capture higher-quality inputs, and partnerships fill geographic or domain gaps. A competitor can buy some of these pieces, but cannot instantly copy years of real-world history and scenario libraries.</p>
+    </div>
+
+    <div class="budget-list">
+      <div>
+        <div class="budget-top">
+          <span class="budget-name">Simulation capacity</span>
+          <span class="budget-pct">35%</span>
+        </div>
+        <div class="budget-track"><div class="budget-fill" style="width:35%;"></div></div>
+      </div>
+      <div>
+        <div class="budget-top">
+          <span class="budget-name">Fleet expansion</span>
+          <span class="budget-pct">20%</span>
+        </div>
+        <div class="budget-track"><div class="budget-fill" style="width:20%;"></div></div>
+      </div>
+      <div>
+        <div class="budget-top">
+          <span class="budget-name">Human labelers</span>
+          <span class="budget-pct">20%</span>
+        </div>
+        <div class="budget-track"><div class="budget-fill" style="width:20%;"></div></div>
+      </div>
+      <div>
+        <div class="budget-top">
+          <span class="budget-name">Sensor upgrades</span>
+          <span class="budget-pct">15%</span>
+        </div>
+        <div class="budget-track"><div class="budget-fill" style="width:15%;"></div></div>
+      </div>
+      <div>
+        <div class="budget-top">
+          <span class="budget-name">Data partnerships</span>
+          <span class="budget-pct">10%</span>
+        </div>
+        <div class="budget-track"><div class="budget-fill" style="width:10%;"></div></div>
+      </div>
+    </div>
+
+    <div class="artifact">
+      <div class="artifact-header">Outside Evaluation -- GitHub Copilot Data Moat</div>
+      <p><strong>1. Where does their data come from?</strong></p>
+      <p>GitHub Copilot's data advantage comes from code, developer workflows, repository context, and usage behavior inside real development environments. The product is not just trained on code as static text. Its value improves when it understands how developers write, accept, reject, edit, and reuse suggestions across real coding tasks.</p>
+      <p><strong>2. Does the data pipeline compound?</strong></p>
+      <p>The pipeline has strong compounding potential because every developer interaction can become a signal about what kinds of suggestions are useful. If users accept certain completions, reject others, and keep working in specific patterns, that behavior helps improve future product design and model behavior. The more Copilot is embedded into daily workflows, the more feedback it can collect about what actually helps developers move faster.</p>
+      <p><strong>3. Can a competitor replicate it with money alone?</strong></p>
+      <p>A competitor can buy compute, hire engineers, and train on public code, but replicating Copilot's distribution inside GitHub and developer IDE workflows is much harder. The moat is not just the code. It is the integration layer, user behavior, enterprise adoption, and feedback loop from millions of real coding sessions.</p>
+      <p><strong>Verdict:</strong> GitHub Copilot has a strong data moat because its advantage comes from both model capability and embedded workflow feedback, not just a one-time training dataset.</p>
+      <div class="artifact-footer">Drafted with Claude and edited for voice and accuracy.</div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       STEP 6: THE RECOMMENDATION
+       ============================================================ -->
+  <div class="section">
+    <div class="section-label">Step 06</div>
+    <div class="section-title">The Recommendation: Seattle as City Five</div>
+    <div class="section-body">
+      <p>I evaluated the candidate cities against Waymo's strategic needs: technical challenge that improves the Driver, data value, social-license feasibility, and alignment with the data budget priorities.</p>
+    </div>
+
+    <div class="city-grid">
+      <div class="city-card selected">
+        <div class="city-name">Seattle</div>
+        <div class="city-note">Rain, hills, cyclists, construction, transit corridors. Technically demanding but not politically blocked. High data value aligned with Dataset C and world model priorities.</div>
+        <div class="city-verdict">Recommended</div>
+      </div>
+      <div class="city-card">
+        <div class="city-name">Atlanta</div>
+        <div class="city-note">Active school-bus trust issues in the case. Social license risk is harder to manage before the product has had a chance to prove itself in that market.</div>
+        <div class="city-verdict">Not recommended</div>
+      </div>
+      <div class="city-card">
+        <div class="city-name">Miami</div>
+        <div class="city-note">Hurricane-season risk adds operational unpredictability that is harder to plan around than typical weather variation and could force unplanned service pauses.</div>
+        <div class="city-verdict">Not recommended</div>
+      </div>
+    </div>
+
+    <div class="artifact">
+      <div class="artifact-header">Strategy Memo -- City Five Recommendation</div>
+      <p><strong>To:</strong> VP of Strategy &nbsp;&nbsp;&nbsp; <strong>From:</strong> Strategy Analyst &nbsp;&nbsp;&nbsp; <strong>Subject:</strong> Recommendation for Waymo City #5</p>
+      <p>I recommend Waymo launch next in Seattle. Seattle gives us a strong strategic test market: technically challenging enough to improve the Driver, but not so politically blocked that the launch becomes impossible before the product can prove itself.</p>
+      <p>First, Seattle is valuable from a technical-readiness standpoint. The city gives us rain, hills, cyclists, construction, transit corridors, and complex urban driving. Those conditions stress perception and planning in exactly the ways that matter after the Austin hesitation incident. My dataset recommendation was Dataset C, the edge-case-heavy option, because these are the conditions where average accuracy is not enough.</p>
+      <p>Second, Seattle strengthens the data moat. My recommended $1B allocation puts 35% toward simulation capacity, 20% toward fleet expansion, 20% toward human labelers, 15% toward sensors, and 10% toward data partnerships. Seattle would generate high-value weather and urban-driving data while the world model creates targeted simulations for rare combinations like rain, hills, cyclists, construction, and emergency vehicles.</p>
+      <p>Third, Seattle has a plausible social-license path. The city will have organized stakeholders, including transit workers, bike advocates, disability-access groups, and emergency responders, but that is manageable if we engage early. Before launch, I would create formal partnerships with Seattle Fire, SDOT, disability-access organizations, and bike-safety groups, with clear incident review processes and public reporting commitments.</p>
+      <p>The risk I am accepting is emergency-response interference. A blocked fire truck would be more damaging than a normal traffic complaint because it attacks the public-safety case for Waymo. My mitigation plan is to build emergency-response protocols before launch, including shared training, escalation paths, and remote-operator coordination with city agencies.</p>
+      <p>In the first six months, I would watch emergency-response incidents, rider wait times, disengagement patterns, cyclist and pedestrian near-misses, and public complaint volume. If those signals stay controlled, Seattle becomes a strong proof point that Waymo can expand into harder cities without losing trust.</p>
+      <div class="artifact-footer">Drafted with Claude and edited for voice and accuracy.</div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       STRATEGIC REFLECTIONS
+       ============================================================ -->
+  <div class="section">
+    <div class="section-label">Strategic Reflections</div>
+    <div class="section-title">What Each Step Taught Me</div>
+
+    <div class="reflection-grid">
+      <div class="reflection-card">
+        <div class="reflection-step">Deep Learning Basics</div>
+        <div class="reflection-title">Pattern learning only works if the patterns are there</div>
+        <div class="reflection-body">Deep learning is not magic. It is a pattern-learning system that improves as it sees more examples, but the quality and variety of those examples determine how well it handles the real world.</div>
+      </div>
+      <div class="reflection-card">
+        <div class="reflection-step">Dataset Strategy</div>
+        <div class="reflection-title">Cheap data is only cheap until something goes wrong</div>
+        <div class="reflection-body">I chose Dataset C because Waymo's biggest risk lives in the long tail. Saving money on easier data is not worth much if the model fails on the rare cases that define safety and public trust.</div>
+      </div>
+      <div class="reflection-card">
+        <div class="reflection-step">World Models</div>
+        <div class="reflection-title">Simulation is how you train before the car meets the edge</div>
+        <div class="reflection-body">World models matter because real-world driving cannot generate enough rare scenarios naturally. Simulation lets Waymo practice targeted edge cases before the car meets them on a public road.</div>
+      </div>
+      <div class="reflection-card">
+        <div class="reflection-step">Reinforcement Learning</div>
+        <div class="reflection-title">The reward function is a business judgment in code</div>
+        <div class="reflection-body">The reward function is not just a technical setting. It is a business and safety judgment written in numbers. Changing the penalty weights changes the kind of driver Waymo is building.</div>
+      </div>
+      <div class="reflection-card">
+        <div class="reflection-step">Data Moat</div>
+        <div class="reflection-title">The advantage is the system, not any single dataset</div>
+        <div class="reflection-body">Waymo's advantage is not one dataset. It is the system that converts miles, simulations, labels, and validation into safer model behavior over time.</div>
+      </div>
+      <div class="reflection-card">
+        <div class="reflection-step">City Recommendation</div>
+        <div class="reflection-title">Technical learning and stakeholder trust both have to hold</div>
+        <div class="reflection-body">Seattle is the best next launch because it creates valuable technical learning while still offering a manageable social-license path if Waymo engages stakeholders early.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       CLOSING
+       ============================================================ -->
+  <div class="section">
+    <div class="section-label">Closing</div>
+    <div class="section-title">The Bigger Lesson</div>
+    <div class="closing-block">
+      <p>The biggest lesson from this lab is that <strong>AI strategy is not just about building a better model.</strong> It is about choosing the right data, defining the right objective, managing the prediction-decision gap, and earning enough trust to deploy the system in the real world.</p>
+    </div>
+  </div>
+
+</div>
+
+<footer class="site-footer">
+  <span>MIS 432: AI in Business &mdash; Western Washington University</span>
+  <span>Kenyon Woodley &nbsp;&middot;&nbsp; <a href="../index.html" style="color:var(--subdued);">Portfolio</a></span>
+</footer>
+
+</body>
+</html>
