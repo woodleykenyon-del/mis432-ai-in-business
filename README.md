@@ -20,6 +20,7 @@ This repo documents hands-on labs and a group project focused on building simpli
 | Group Project: Milestone 1 | Coming soon | In progress |
 | Group Project: Milestone 2 | Coming soon | In progress |
 | Group Project: Milestone 3 | Coming soon | In progress |
+| [Exam 1 Artifacts](https://woodleykenyon-del.github.io/mis432-ai-in-business/exam1/) | A/B test simulation and CourseFit AI prototype | Complete |
 
 ## Structure
 
@@ -35,4 +36,7 @@ lab5/index.html               # Lab 5: Waymo Strategy Analysis
 project/milestone1/index.html # Group Project Milestone 1 (placeholder)
 project/milestone2/index.html # Group Project Milestone 2 (placeholder)
 project/milestone3/index.html # Group Project Milestone 3 (placeholder)
+exam1/index.html               # Exam 1 landing page
+exam1/part2-ab-test/index.html # Exam 1 Part 2: A/B test simulation
+exam1/coursefit-ai/index.html  # Exam 1 Part 3: CourseFit AI prototype
 ```

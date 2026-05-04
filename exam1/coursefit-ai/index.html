@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CourseFit AI &mdash; MIS 432 Exam 1</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../../assets/css/styles.css" />
+  <style>
+    /* ── PAGE-SPECIFIC STYLES ── */
+
+    .content-section {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 2.75rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .content-section:last-of-type { border-bottom: none; }
+
+    .section-label {
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 1.25rem;
+    }
+
+    .content-section h2 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      letter-spacing: -0.015em;
+      margin-bottom: 1rem;
+      color: var(--text);
+    }
+
+    .content-section p {
+      font-size: 0.97rem;
+      color: #374151;
+      line-height: 1.8;
+      margin-bottom: 1rem;
+      max-width: 720px;
+    }
+
+    .content-section p:last-child { margin-bottom: 0; }
+
+    /* ── FORM ── */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-top: 0.5rem;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .form-group.full-width {
+      grid-column: 1 / -1;
+    }
+
+    .form-label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 0.5rem;
+      letter-spacing: 0.01em;
+    }
+
+    .form-hint {
+      font-size: 0.74rem;
+      color: var(--muted);
+      margin-bottom: 0.5rem;
+    }
+
+    .form-select {
+      appearance: none;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 0.65rem 2rem 0.65rem 0.85rem;
+      font-family: inherit;
+      font-size: 0.9rem;
+      color: var(--text);
+      cursor: pointer;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b7280' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.85rem center;
+      transition: border-color 0.15s;
+    }
+
+    .form-select:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(26, 58, 92, 0.1);
+    }
+
+    .checkbox-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .checkbox-label {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-size: 0.88rem;
+      color: #374151;
+      cursor: pointer;
+      line-height: 1.4;
+    }
+
+    .checkbox-label input[type="checkbox"] {
+      width: 15px;
+      height: 15px;
+      accent-color: var(--accent);
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+
+    .generate-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius);
+      padding: 0.8rem 2rem;
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+      margin-top: 1.75rem;
+    }
+
+    .generate-btn:hover { background: #163256; transform: translateY(-1px); }
+    .generate-btn:active { transform: translateY(0); }
+
+    .form-error {
+      display: none;
+      color: #dc2626;
+      font-size: 0.85rem;
+      margin-top: 0.75rem;
+      padding: 0.6rem 0.85rem;
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      border-radius: 5px;
+    }
+
+    /* ── RESULTS ── */
+    #results-section {
+      display: none;
+    }
+
+    /* HITL Warning */
+    .hitl-banner {
+      background: #fefce8;
+      border: 1px solid #fde047;
+      border-radius: var(--radius);
+      padding: 1rem 1.35rem;
+      display: flex;
+      gap: 0.85rem;
+      align-items: flex-start;
+      margin-bottom: 2rem;
+    }
+
+    .hitl-icon {
+      font-size: 1.1rem;
+      flex-shrink: 0;
+      margin-top: 0.05rem;
+    }
+
+    .hitl-text {
+      font-size: 0.88rem;
+      color: #713f12;
+      line-height: 1.65;
+    }
+
+    .hitl-text strong { color: #451a03; }
+
+    /* Fit score header */
+    .results-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .results-header h3 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .fit-badge {
+      display: inline-block;
+      padding: 0.3rem 0.85rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    /* Recommendation cards */
+    .rec-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .rec-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.35rem 1.5rem;
+      display: grid;
+      grid-template-columns: 40px 1fr;
+      gap: 1rem;
+      align-items: start;
+    }
+
+    .rec-card.rank-1 {
+      border-color: var(--accent);
+      background: var(--accent-light);
+    }
+
+    .rec-rank {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--muted);
+      flex-shrink: 0;
+    }
+
+    .rec-card.rank-1 .rec-rank {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .rec-body {}
+
+    .rec-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 0.3rem;
+    }
+
+    .rec-score-bar-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.6rem;
+    }
+
+    .rec-score-bar {
+      flex: 1;
+      height: 6px;
+      background: var(--border);
+      border-radius: 3px;
+      overflow: hidden;
+      max-width: 200px;
+    }
+
+    .rec-score-fill {
+      height: 100%;
+      background: var(--accent);
+      border-radius: 3px;
+      transition: width 0.4s ease;
+    }
+
+    .rec-card.rank-1 .rec-score-fill { background: var(--accent); }
+
+    .rec-score-pct {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--accent);
+      white-space: nowrap;
+    }
+
+    .rec-desc {
+      font-size: 0.88rem;
+      color: #374151;
+      line-height: 1.65;
+      margin-bottom: 0.6rem;
+    }
+
+    .rec-why {
+      font-size: 0.8rem;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .rec-why strong { color: var(--text); }
+
+    /* Secondary output areas */
+    .output-block {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .output-block-label {
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.6rem;
+    }
+
+    .output-block p {
+      font-size: 0.9rem;
+      color: #374151;
+      line-height: 1.7;
+      margin: 0;
+      max-width: none;
+    }
+
+    .gap-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .gap-list li {
+      font-size: 0.9rem;
+      color: #374151;
+      line-height: 1.5;
+      padding: 0.3rem 0;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .gap-list li:last-child { border-bottom: none; }
+
+    .gap-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #f59e0b;
+      flex-shrink: 0;
+    }
+
+    .no-gaps-note {
+      font-size: 0.88rem;
+      color: #059669;
+    }
+
+    /* ── AI FACTORY GRID ── */
+    .factory-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      margin-top: 1.25rem;
+    }
+
+    .factory-cell {
+      background: var(--surface);
+      padding: 1.25rem;
+    }
+
+    .factory-step {
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 0.35rem;
+    }
+
+    .factory-title {
+      font-size: 0.88rem;
+      font-weight: 600;
+      margin-bottom: 0.35rem;
+    }
+
+    .factory-desc {
+      font-size: 0.78rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    /* ── BUSINESS CASE ── */
+    .bcase-section {
+      max-width: 720px;
+    }
+
+    .bcase-section h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 0.6rem;
+      margin-top: 1.5rem;
+    }
+
+    .bcase-section h3:first-child { margin-top: 0; }
+
+    .bcase-section p {
+      font-size: 0.93rem;
+      color: #374151;
+      line-height: 1.8;
+      margin-bottom: 0.5rem;
+      max-width: none;
+    }
+
+    /* ── PROCESS NOTE ── */
+    .process-note {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem 1.5rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    .process-note strong { color: var(--text); }
+
+    .exam1-footer-link { color: var(--accent); }
+
+    @media (max-width: 640px) {
+      .form-grid { grid-template-columns: 1fr; }
+      .factory-grid { grid-template-columns: 1fr 1fr; }
+      .rec-card { grid-template-columns: 1fr; }
+      .rec-rank { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="site-nav">
+  <span class="nav-brand">MIS 432 &mdash; AI in Business</span>
+  <a href="../../index.html" class="nav-back">&larr; Back to Portfolio</a>
+</nav>
+
+<header class="page-header">
+  <div class="tag">Exam 1 &mdash; Part 3</div>
+  <h1>CourseFit AI</h1>
+  <p class="subtitle">
+    A course-to-career advising prototype for WWU business students. Enter your profile and get personalized recommendations for which electives and skill areas to prioritize next.
+  </p>
+</header>
+
+<!-- ── FORM ── -->
+<div class="content-section">
+  <div class="section-label">Student Profile</div>
+  <h2>Tell us about your goals</h2>
+  <p>Select your major, career goal, interests, completed coursework, and preferred work style. CourseFit AI will use a transparent scoring system to rank the course and skill areas most relevant to your situation.</p>
+
+  <div class="form-grid">
+
+    <div class="form-group">
+      <label class="form-label" for="major">Major or Concentration</label>
+      <select class="form-select" id="major">
+        <option value="">-- Select your major --</option>
+        <option value="supply-chain">Manufacturing and Supply Chain Management</option>
+        <option value="mis">Management Information Systems</option>
+        <option value="finance">Finance</option>
+        <option value="marketing">Marketing</option>
+        <option value="accounting">Accounting</option>
+        <option value="business-analytics">Business Analytics</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="career">Career Goal</label>
+      <select class="form-select" id="career">
+        <option value="">-- Select a career goal --</option>
+        <option value="supply-chain-analyst">Supply Chain Analyst</option>
+        <option value="procurement">Procurement Specialist</option>
+        <option value="operations-manager">Operations Manager</option>
+        <option value="business-analyst">Business Analyst</option>
+        <option value="product-manager">Product Manager</option>
+        <option value="data-analyst">Data Analyst</option>
+        <option value="consultant">Consultant</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Interests</label>
+      <span class="form-hint">Select all that apply</span>
+      <div class="checkbox-group">
+        <label class="checkbox-label"><input type="checkbox" name="interest" value="operations"> Operations</label>
+        <label class="checkbox-label"><input type="checkbox" name="interest" value="technology"> Technology</label>
+        <label class="checkbox-label"><input type="checkbox" name="interest" value="people-facing"> People-facing work</label>
+        <label class="checkbox-label"><input type="checkbox" name="interest" value="data"> Data</label>
+        <label class="checkbox-label"><input type="checkbox" name="interest" value="strategy"> Strategy</label>
+        <label class="checkbox-label"><input type="checkbox" name="interest" value="sustainability"> Sustainability</label>
+        <label class="checkbox-label"><input type="checkbox" name="interest" value="project-management"> Project management</label>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Completed Course Areas</label>
+      <span class="form-hint">Check what you have already studied</span>
+      <div class="checkbox-group">
+        <label class="checkbox-label"><input type="checkbox" name="completed" value="excel-analytics"> Excel / analytics</label>
+        <label class="checkbox-label"><input type="checkbox" name="completed" value="sql-databases"> SQL / databases</label>
+        <label class="checkbox-label"><input type="checkbox" name="completed" value="operations-management"> Operations management</label>
+        <label class="checkbox-label"><input type="checkbox" name="completed" value="supply-chain"> Supply chain</label>
+        <label class="checkbox-label"><input type="checkbox" name="completed" value="marketing"> Marketing</label>
+        <label class="checkbox-label"><input type="checkbox" name="completed" value="finance"> Finance</label>
+        <label class="checkbox-label"><input type="checkbox" name="completed" value="project-management"> Project management</label>
+      </div>
+    </div>
+
+    <div class="form-group full-width">
+      <label class="form-label">Preferred Work Style</label>
+      <span class="form-hint">Select all that apply</span>
+      <div class="checkbox-group" style="flex-direction:row;flex-wrap:wrap;gap:0.65rem">
+        <label class="checkbox-label"><input type="checkbox" name="style" value="analytical"> Analytical</label>
+        <label class="checkbox-label"><input type="checkbox" name="style" value="people-oriented"> People-oriented</label>
+        <label class="checkbox-label"><input type="checkbox" name="style" value="strategic"> Strategic</label>
+        <label class="checkbox-label"><input type="checkbox" name="style" value="hands-on-operations"> Hands-on operations</label>
+        <label class="checkbox-label"><input type="checkbox" name="style" value="technical-systems"> Technical systems</label>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="form-error" id="form-error">Please select at least a major and a career goal before generating recommendations.</div>
+
+  <button class="generate-btn" id="generate-btn" onclick="generateRecommendations()">
+    Generate Recommendation
+  </button>
+</div>
+
+<!-- ── RESULTS ── -->
+<div id="results-section" class="content-section">
+  <div class="section-label">Your CourseFit Results</div>
+
+  <div class="hitl-banner">
+    <div class="hitl-icon">&#9888;&#65039;</div>
+    <div class="hitl-text">
+      <strong>Human-in-the-loop reminder:</strong> These recommendations are generated by a rules-based scoring system, not by an academic advisor. They do not account for course availability, prerequisites, graduation requirements, financial aid rules, or sequencing constraints. Use this output as a starting point for a conversation with your academic advisor, not as a substitute for one.
+    </div>
+  </div>
+
+  <div class="results-header">
+    <h3 id="results-headline">Your Top Course Recommendations</h3>
+    <div class="fit-badge" id="fit-badge"></div>
+  </div>
+
+  <div class="rec-list" id="rec-list">
+    <!-- Populated by JS -->
+  </div>
+
+  <div class="output-block" id="career-fit-block">
+    <div class="output-block-label">Career Fit Analysis</div>
+    <p id="career-fit-text"></p>
+  </div>
+
+  <div class="output-block" id="gaps-block">
+    <div class="output-block-label">Skill Gaps to Address</div>
+    <ul class="gap-list" id="gaps-list"></ul>
+  </div>
+
+  <div class="output-block" id="next-action-block">
+    <div class="output-block-label">Suggested Next Action</div>
+    <p id="next-action-text"></p>
+  </div>
+</div>
+
+<!-- ── HOW IT WORKS ── -->
+<div class="content-section">
+  <div class="section-label">How It Works</div>
+  <h2>The AI Factory behind CourseFit AI</h2>
+  <p>CourseFit AI uses a transparent, rules-based scoring system. There is no hidden model or external API. Every point assigned to a recommendation can be traced back to a specific input you provided.</p>
+
+  <div class="factory-grid">
+    <div class="factory-cell">
+      <div class="factory-step">01 &mdash; Data</div>
+      <div class="factory-title">Student Inputs</div>
+      <div class="factory-desc">Major, career goal, interests, completed course areas, and preferred work style &mdash; all provided by the student.</div>
+    </div>
+    <div class="factory-cell">
+      <div class="factory-step">02 &mdash; Model</div>
+      <div class="factory-title">Scoring and Ranking</div>
+      <div class="factory-desc">A point-based scoring system compares the student profile against ten course and skill pathways. Each input category contributes up to a fixed number of points.</div>
+    </div>
+    <div class="factory-cell">
+      <div class="factory-step">03 &mdash; Prediction</div>
+      <div class="factory-title">Best-Fit Areas</div>
+      <div class="factory-desc">The system predicts which course or skill areas are most likely to align with the student's career goal and current profile.</div>
+    </div>
+    <div class="factory-cell">
+      <div class="factory-step">04 &mdash; Decision</div>
+      <div class="factory-title">Student + Advisor Choice</div>
+      <div class="factory-desc">The student decides what to explore, research, or discuss with an academic advisor. The prototype supports the decision, it does not make it.</div>
+    </div>
+    <div class="factory-cell">
+      <div class="factory-step">05 &mdash; Value</div>
+      <div class="factory-title">Better Planning Conversations</div>
+      <div class="factory-desc">Students arrive at advising appointments with a clearer shortlist, saving time and helping them ask more targeted questions.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── BUSINESS CASE ── -->
+<div class="content-section">
+  <div class="section-label">Business Case</div>
+  <h2>Why CourseFit AI should exist</h2>
+  <div class="bcase-section">
+
+    <h3>The problem</h3>
+    <p>
+      Many business students have to choose electives and skill-building paths without a clear view of how those choices connect to their career goals. They often rely on scattered course catalog pages, peer advice, or one-off advising appointments, which can be useful but not always personalized enough. CourseFit AI helps organize that decision by connecting a student's goals, interests, and completed coursework to specific next steps.
+    </p>
+
+    <h3>The user</h3>
+    <p>
+      The target user is a WWU business student, especially a junior or senior choosing electives or trying to prepare for a career path. Before using the prototype, the student may know their major but still feel unsure about which skills or courses will actually help them. After using it, they have a clearer shortlist of options to explore and a stronger starting point for a conversation with an advisor.
+    </p>
+
+    <h3>Why this should be AI-powered</h3>
+    <p>
+      This should be AI-powered because the decision depends on multiple inputs at once: major, career goal, interests, completed coursework, and preferred work style. A spreadsheet or course catalog can list options, but it does not easily translate a student's situation into a personalized recommendation with reasoning. The value of the prototype is not that it replaces an advisor, but that it helps the student ask better questions and narrow the decision before meeting with a human.
+    </p>
+
+    <h3>The biggest risk</h3>
+    <p>
+      The biggest risk is that a student could over-trust the recommendation and avoid a course that is required, time-sensitive, or better suited to their situation than the prototype realizes. For example, a first-generation student trying to graduate on time could be harmed if they treat the tool as official advising and miss a prerequisite or sequencing requirement. That is why CourseFit AI needs a clear human-in-the-loop design: it should support planning, not replace academic advising.
+    </p>
+
+    <h3>Course concept 1: Prediction-decision gap</h3>
+    <p>
+      The prototype predicts which course and skill areas appear to fit a student's profile, but the final decision still belongs to the student and advisor. A recommendation can look strong based on interests and career goals while still being wrong because of prerequisites, graduation timing, financial aid rules, or course availability. That is the prediction-decision gap: a useful prediction does not automatically become the right action.
+    </p>
+
+    <h3>Course concept 2: Data dependency</h3>
+    <p>
+      CourseFit AI is only as good as the information it uses. If the student inputs are incomplete, or if the tool does not include updated course availability, prerequisite chains, or advisor knowledge, its recommendations can become misleading. This is similar to other AI systems from the course where the model's output depends heavily on whether the data actually represents the real decision environment.
+    </p>
+
+  </div>
+</div>
+
+<!-- ── PROCESS NOTE ── -->
+<div class="content-section">
+  <div class="section-label">Process Note</div>
+  <h2>How this artifact was built</h2>
+  <div class="process-note">
+    <strong>GenAI tool used:</strong> Claude Code<br/>
+    <strong>Process:</strong> I used Claude Code to build the static prototype and scoring logic, then reviewed the interface, recommendation output, and risk language so it matched the business case.
+  </div>
+</div>
+
+<!-- ── FOOTER ── -->
+<footer class="site-footer">
+  <span>MIS 432: AI in Business &mdash; Western Washington University</span>
+  <span>
+    <a class="exam1-footer-link" href="../index.html">Exam 1 Landing</a>
+    &nbsp;&middot;&nbsp;
+    <a class="exam1-footer-link" href="../../index.html">Portfolio Homepage</a>
+  </span>
+</footer>
+
+<script>
+  // ============================================================
+  // COURSEFIT AI: TRANSPARENT RULES-BASED SCORING ENGINE
+  // Each recommendation is scored against the student's inputs.
+  // Points are assigned per category (major, career, interests,
+  // work style, skill gap). Scores are normalized to a 0-100 scale.
+  // ============================================================
+
+  // Human-readable labels for display
+  var MAJOR_LABELS = {
+    'supply-chain':       'Manufacturing and Supply Chain Management',
+    'mis':                'Management Information Systems',
+    'finance':            'Finance',
+    'marketing':          'Marketing',
+    'accounting':         'Accounting',
+    'business-analytics': 'Business Analytics'
+  };
+
+  var CAREER_LABELS = {
+    'supply-chain-analyst': 'Supply Chain Analyst',
+    'procurement':          'Procurement Specialist',
+    'operations-manager':   'Operations Manager',
+    'business-analyst':     'Business Analyst',
+    'product-manager':      'Product Manager',
+    'data-analyst':         'Data Analyst',
+    'consultant':           'Consultant'
+  };
+
+  var INTEREST_LABELS = {
+    'operations':         'Operations',
+    'technology':         'Technology',
+    'people-facing':      'People-facing work',
+    'data':               'Data',
+    'strategy':           'Strategy',
+    'sustainability':     'Sustainability',
+    'project-management': 'Project management'
+  };
+
+  var STYLE_LABELS = {
+    'analytical':          'analytical',
+    'people-oriented':     'people-oriented',
+    'strategic':           'strategic',
+    'hands-on-operations': 'hands-on operations',
+    'technical-systems':   'technical systems'
+  };
+
+  var COMPLETED_LABELS = {
+    'excel-analytics':      'Excel and analytics',
+    'sql-databases':        'SQL and database systems',
+    'operations-management':'Operations management',
+    'supply-chain':         'Supply chain',
+    'marketing':            'Marketing',
+    'finance':              'Finance',
+    'project-management':   'Project management'
+  };
+
+  // Skill gaps relevant to each career goal
+  // These are the areas the scoring system will check for gaps
+  var CAREER_GAP_MAP = {
+    'supply-chain-analyst': ['supply-chain', 'excel-analytics', 'operations-management'],
+    'procurement':          ['supply-chain', 'finance'],
+    'operations-manager':   ['operations-management', 'project-management', 'supply-chain'],
+    'business-analyst':     ['excel-analytics', 'sql-databases', 'project-management'],
+    'product-manager':      ['project-management', 'excel-analytics'],
+    'data-analyst':         ['excel-analytics', 'sql-databases'],
+    'consultant':           ['excel-analytics', 'project-management', 'finance']
+  };
+
+  // Descriptions and next actions for each recommendation area
+  var REC_DETAILS = {
+    'excel-analytics': {
+      desc: 'Build deeper proficiency in data analysis, pivot tables, financial modeling, and visualization within Excel. This skill transfers directly to nearly every business role.',
+      action: 'Look for upper-level business analytics or MIS electives focused on Excel modeling. Many finance and supply chain electives also integrate Excel heavily.'
+    },
+    'sql-databases': {
+      desc: 'Learn to query relational databases, extract structured data, and build reports using SQL. Foundational for data-oriented roles in any industry.',
+      action: 'Look for MIS or business analytics electives covering database management or data querying. Ask your advisor about courses that fulfill the MIS breadth requirement.'
+    },
+    'procurement-sourcing': {
+      desc: 'Explore how organizations select and manage suppliers, negotiate contracts, and build sourcing strategies. Core knowledge for supply chain and procurement roles.',
+      action: 'Look for supply chain electives that cover sourcing and supplier management. Industry certifications like CPSM can also complement coursework.'
+    },
+    'demand-planning': {
+      desc: 'Understand how organizations forecast product demand, plan inventory levels, and manage supply variability. High demand in supply chain and analytics roles.',
+      action: 'Look for upper-level supply chain or operations management electives. Courses covering forecasting methods or inventory optimization are most relevant.'
+    },
+    'project-management': {
+      desc: 'Develop skills in scoping, scheduling, budgeting, and leading cross-functional projects. Valuable across consulting, product, operations, and business analyst paths.',
+      action: 'Look for project management electives in the CBE catalog. PMP certification courses are also available through professional development if you want to go further.'
+    },
+    'operations-strategy': {
+      desc: 'Learn how organizations design and improve their operations to achieve competitive advantage. Covers process design, capacity planning, and strategic trade-offs.',
+      action: 'Look for upper-level supply chain or strategy electives that cover operational decision-making. Some MBA-path electives touch this area as well.'
+    },
+    'business-communication': {
+      desc: 'Build skills in written communication, data storytelling, and stakeholder presentations. Critical for consulting, product management, and client-facing roles.',
+      action: 'Look for business writing, presentation, or professional communication electives. Marketing and management electives often develop these skills indirectly.'
+    },
+    'data-visualization': {
+      desc: 'Learn to translate data into clear charts, dashboards, and stories that inform business decisions. Tools include Tableau, Power BI, and Python visualization libraries.',
+      action: 'Look for business analytics electives covering Tableau or Power BI. Some MIS electives also include data visualization as a component.'
+    },
+    'sustainability-supply': {
+      desc: 'Explore how organizations integrate environmental and social considerations into supply chain decisions. Growing importance in procurement and operations roles.',
+      action: 'Look for sustainability, corporate responsibility, or supply chain ethics electives in the CBE catalog. Operations electives sometimes include sustainability modules.'
+    },
+    'product-process': {
+      desc: 'Study methods for analyzing and improving business processes and product quality, including Lean principles and Six Sigma frameworks.',
+      action: 'Look for quality management, process improvement, or Lean operations electives. Supply chain and operations management electives often cover these methods.'
+    }
+  };
+
+  // ── SCORING MATRIX ──
+  // Each recommendation area is scored across five input dimensions.
+  // majorPoints and careerPoints: direct match scores (0-3).
+  // interestPoints: per-interest contribution (capped at 4 total).
+  // stylePoints: per-style contribution (capped at 3 total).
+  // gapPrereq: the most relevant completed-course area.
+  //   If NOT completed: +2 (it is a real skill gap to fill)
+  //   If completed:     -1 (less urgent; foundation already there)
+  // Max possible score per recommendation: 3+3+4+3+2 = 15
+  var RECOMMENDATIONS = [
+    {
+      id: 'excel-analytics',
+      title: 'Advanced Excel and Analytics',
+      majorPoints:    { 'finance': 3, 'business-analytics': 3, 'accounting': 3, 'mis': 2, 'marketing': 2, 'supply-chain': 1 },
+      careerPoints:   { 'data-analyst': 3, 'business-analyst': 3, 'consultant': 2, 'supply-chain-analyst': 2, 'procurement': 1, 'product-manager': 1, 'operations-manager': 1 },
+      interestPoints: { 'data': 3, 'strategy': 1, 'operations': 1 },
+      stylePoints:    { 'analytical': 3, 'strategic': 1 },
+      gapPrereq:      'excel-analytics'
+    },
+    {
+      id: 'sql-databases',
+      title: 'SQL and Database Systems',
+      majorPoints:    { 'mis': 3, 'business-analytics': 3, 'finance': 2, 'supply-chain': 1, 'marketing': 1, 'accounting': 1 },
+      careerPoints:   { 'data-analyst': 3, 'business-analyst': 2, 'product-manager': 2, 'consultant': 1, 'supply-chain-analyst': 1 },
+      interestPoints: { 'data': 3, 'technology': 2, 'strategy': 1 },
+      stylePoints:    { 'analytical': 3, 'technical-systems': 3 },
+      gapPrereq:      'sql-databases'
+    },
+    {
+      id: 'procurement-sourcing',
+      title: 'Procurement and Sourcing',
+      majorPoints:    { 'supply-chain': 3, 'finance': 2, 'accounting': 1, 'mis': 1, 'marketing': 1, 'business-analytics': 1 },
+      careerPoints:   { 'procurement': 3, 'supply-chain-analyst': 3, 'operations-manager': 2, 'consultant': 1 },
+      interestPoints: { 'operations': 3, 'sustainability': 2, 'strategy': 1 },
+      stylePoints:    { 'hands-on-operations': 3, 'strategic': 2 },
+      gapPrereq:      'supply-chain'
+    },
+    {
+      id: 'demand-planning',
+      title: 'Demand Planning and Forecasting',
+      majorPoints:    { 'supply-chain': 3, 'business-analytics': 3, 'finance': 2, 'mis': 2, 'accounting': 1 },
+      careerPoints:   { 'supply-chain-analyst': 3, 'operations-manager': 2, 'business-analyst': 2, 'data-analyst': 2 },
+      interestPoints: { 'operations': 3, 'data': 2, 'strategy': 2 },
+      stylePoints:    { 'analytical': 3, 'hands-on-operations': 2 },
+      gapPrereq:      'operations-management'
+    },
+    {
+      id: 'project-management',
+      title: 'Project Management',
+      majorPoints:    { 'mis': 2, 'supply-chain': 2, 'marketing': 2, 'finance': 2, 'accounting': 2, 'business-analytics': 2 },
+      careerPoints:   { 'product-manager': 3, 'consultant': 3, 'operations-manager': 2, 'business-analyst': 2, 'procurement': 1, 'supply-chain-analyst': 1 },
+      interestPoints: { 'project-management': 3, 'people-facing': 2, 'strategy': 2, 'operations': 1 },
+      stylePoints:    { 'people-oriented': 2, 'strategic': 2, 'hands-on-operations': 1 },
+      gapPrereq:      'project-management'
+    },
+    {
+      id: 'operations-strategy',
+      title: 'Operations Strategy',
+      majorPoints:    { 'supply-chain': 3, 'business-analytics': 2, 'mis': 2, 'finance': 1, 'marketing': 1, 'accounting': 1 },
+      careerPoints:   { 'operations-manager': 3, 'consultant': 3, 'supply-chain-analyst': 2, 'product-manager': 2, 'business-analyst': 1 },
+      interestPoints: { 'operations': 3, 'strategy': 3, 'sustainability': 2 },
+      stylePoints:    { 'strategic': 3, 'hands-on-operations': 2 },
+      gapPrereq:      'operations-management'
+    },
+    {
+      id: 'business-communication',
+      title: 'Business Communication',
+      majorPoints:    { 'marketing': 3, 'supply-chain': 2, 'mis': 2, 'finance': 1, 'accounting': 1, 'business-analytics': 1 },
+      careerPoints:   { 'consultant': 3, 'product-manager': 3, 'procurement': 2, 'business-analyst': 2, 'operations-manager': 1 },
+      interestPoints: { 'people-facing': 3, 'strategy': 2 },
+      stylePoints:    { 'people-oriented': 3, 'strategic': 2 },
+      gapPrereq:      'marketing'
+    },
+    {
+      id: 'data-visualization',
+      title: 'Data Visualization',
+      majorPoints:    { 'business-analytics': 3, 'mis': 3, 'finance': 2, 'marketing': 2, 'supply-chain': 1, 'accounting': 1 },
+      careerPoints:   { 'data-analyst': 3, 'business-analyst': 3, 'consultant': 2, 'supply-chain-analyst': 1, 'product-manager': 1 },
+      interestPoints: { 'data': 3, 'technology': 2, 'strategy': 1 },
+      stylePoints:    { 'analytical': 3, 'technical-systems': 2 },
+      gapPrereq:      'excel-analytics'
+    },
+    {
+      id: 'sustainability-supply',
+      title: 'Sustainability in Supply Chains',
+      majorPoints:    { 'supply-chain': 3, 'marketing': 2, 'finance': 1, 'accounting': 1, 'mis': 1, 'business-analytics': 1 },
+      careerPoints:   { 'supply-chain-analyst': 3, 'operations-manager': 2, 'procurement': 2, 'consultant': 2 },
+      interestPoints: { 'sustainability': 3, 'operations': 3, 'strategy': 1 },
+      stylePoints:    { 'strategic': 2, 'hands-on-operations': 2 },
+      gapPrereq:      'supply-chain'
+    },
+    {
+      id: 'product-process',
+      title: 'Product and Process Improvement',
+      majorPoints:    { 'supply-chain': 3, 'business-analytics': 2, 'mis': 2, 'finance': 1, 'marketing': 1, 'accounting': 1 },
+      careerPoints:   { 'product-manager': 3, 'operations-manager': 3, 'business-analyst': 2, 'supply-chain-analyst': 2, 'consultant': 1 },
+      interestPoints: { 'operations': 3, 'technology': 2, 'project-management': 2 },
+      stylePoints:    { 'hands-on-operations': 3, 'strategic': 2 },
+      gapPrereq:      'operations-management'
+    }
+  ];
+
+  // ── SCORE A SINGLE RECOMMENDATION ──
+  function scoreRec(rec, inputs) {
+    var score = 0;
+
+    // Major points (max 3)
+    score += rec.majorPoints[inputs.major] || 0;
+
+    // Career goal points (max 3)
+    score += rec.careerPoints[inputs.career] || 0;
+
+    // Interest points (cap at 4)
+    var interestTotal = 0;
+    inputs.interests.forEach(function(i) {
+      interestTotal += rec.interestPoints[i] || 0;
+    });
+    score += Math.min(interestTotal, 4);
+
+    // Work style points (cap at 3)
+    var styleTotal = 0;
+    inputs.styles.forEach(function(s) {
+      styleTotal += rec.stylePoints[s] || 0;
+    });
+    score += Math.min(styleTotal, 3);
+
+    // Gap analysis: +2 if prerequisite area is a skill gap, -1 if already done
+    if (rec.gapPrereq) {
+      if (inputs.completed.indexOf(rec.gapPrereq) === -1) {
+        score += 2; // this area represents a real gap in the student's profile
+      } else {
+        score -= 1; // foundation is there; less urgent as a new priority
+      }
+    }
+
+    return score;
+  }
+
+  // ── GENERATE HUMAN-READABLE "WHY" EXPLANATION ──
+  function buildWhyText(rec, inputs) {
+    var reasons = [];
+
+    var majorPts = rec.majorPoints[inputs.major] || 0;
+    if (majorPts >= 2) reasons.push('your ' + MAJOR_LABELS[inputs.major] + ' major');
+
+    var careerPts = rec.careerPoints[inputs.career] || 0;
+    if (careerPts >= 2) reasons.push('the ' + CAREER_LABELS[inputs.career] + ' career path');
+
+    var matchInterests = inputs.interests.filter(function(i) {
+      return (rec.interestPoints[i] || 0) >= 2;
+    });
+    if (matchInterests.length > 0) {
+      reasons.push('your interest in ' + matchInterests.map(function(i) { return INTEREST_LABELS[i]; }).join(' and '));
+    }
+
+    var matchStyles = inputs.styles.filter(function(s) {
+      return (rec.stylePoints[s] || 0) >= 2;
+    });
+    if (matchStyles.length > 0) {
+      reasons.push('a ' + matchStyles.map(function(s) { return STYLE_LABELS[s]; }).join(' and ') + ' work style');
+    }
+
+    if (rec.gapPrereq && inputs.completed.indexOf(rec.gapPrereq) === -1) {
+      reasons.push('it fills a gap in your current coursework');
+    }
+
+    if (reasons.length === 0) return 'Aligns broadly with your overall profile.';
+    if (reasons.length === 1) return 'Selected based on ' + reasons[0] + '.';
+    return 'Selected based on ' + reasons.slice(0, -1).join(', ') + ', and ' + reasons[reasons.length - 1] + '.';
+  }
+
+  // ── FIT LABEL AND STYLING ──
+  function fitLabel(pct) {
+    if (pct >= 72) return { label: 'Excellent Fit', bg: '#dcfce7', color: '#14532d' };
+    if (pct >= 52) return { label: 'Strong Fit',    bg: '#dbeafe', color: '#1e3a8a' };
+    if (pct >= 33) return { label: 'Good Fit',      bg: '#ede9fe', color: '#4c1d95' };
+    return               { label: 'Partial Fit',   bg: '#fef3c7', color: '#78350f' };
+  }
+
+  // ── FIND SKILL GAPS ──
+  function findGaps(inputs) {
+    var needed = CAREER_GAP_MAP[inputs.career] || [];
+    return needed
+      .filter(function(area) { return inputs.completed.indexOf(area) === -1; })
+      .map(function(area) { return COMPLETED_LABELS[area]; });
+  }
+
+  // ── MAIN: GENERATE RECOMMENDATIONS ──
+  function generateRecommendations() {
+    var major  = document.getElementById('major').value;
+    var career = document.getElementById('career').value;
+
+    if (!major || !career) {
+      var err = document.getElementById('form-error');
+      err.style.display = 'block';
+      err.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      return;
+    }
+
+    document.getElementById('form-error').style.display = 'none';
+
+    // Collect checkbox inputs
+    var interests = Array.from(document.querySelectorAll('input[name="interest"]:checked')).map(function(el) { return el.value; });
+    var completed = Array.from(document.querySelectorAll('input[name="completed"]:checked')).map(function(el) { return el.value; });
+    var styles    = Array.from(document.querySelectorAll('input[name="style"]:checked')).map(function(el) { return el.value; });
+
+    var inputs = { major: major, career: career, interests: interests, completed: completed, styles: styles };
+
+    // Score every recommendation and sort descending
+    var scored = RECOMMENDATIONS.map(function(rec) {
+      return { rec: rec, score: scoreRec(rec, inputs) };
+    });
+    scored.sort(function(a, b) { return b.score - a.score; });
+
+    var top3 = scored.slice(0, 3);
+    var MAX_SCORE = 15;
+    var topPct = Math.round(Math.min(top3[0].score / MAX_SCORE, 1) * 100);
+
+    // Set fit badge
+    var fit = fitLabel(topPct);
+    var badge = document.getElementById('fit-badge');
+    badge.textContent = fit.label + ' (' + topPct + '%)';
+    badge.style.background = fit.bg;
+    badge.style.color = fit.color;
+
+    // Build recommendation cards
+    var recListEl = document.getElementById('rec-list');
+    recListEl.innerHTML = '';
+    top3.forEach(function(item, idx) {
+      var rank = idx + 1;
+      var pct  = Math.round(Math.min(item.score / MAX_SCORE, 1) * 100);
+      var detail = REC_DETAILS[item.rec.id] || { desc: '', action: '' };
+      var why = buildWhyText(item.rec, inputs);
+      var cardClass = rank === 1 ? 'rec-card rank-1' : 'rec-card';
+
+      recListEl.innerHTML +=
+        '<div class="' + cardClass + '">' +
+          '<div class="rec-rank">' + rank + '</div>' +
+          '<div class="rec-body">' +
+            '<div class="rec-title">' + item.rec.title + '</div>' +
+            '<div class="rec-score-bar-wrap">' +
+              '<div class="rec-score-bar"><div class="rec-score-fill" style="width:' + pct + '%"></div></div>' +
+              '<span class="rec-score-pct">' + pct + '% fit</span>' +
+            '</div>' +
+            '<div class="rec-desc">' + detail.desc + '</div>' +
+            '<div class="rec-why"><strong>Why selected:</strong> ' + why + '</div>' +
+          '</div>' +
+        '</div>';
+    });
+
+    // Career fit text
+    var topRecTitle = top3[0].rec.title.toLowerCase();
+    document.getElementById('career-fit-text').textContent =
+      'Your profile points toward the ' + CAREER_LABELS[career] + ' path. Based on your ' + MAJOR_LABELS[major] + ' background' +
+      (interests.length > 0 ? ' and your interest in ' + interests.slice(0, 2).map(function(i) { return INTEREST_LABELS[i]; }).join(' and ') : '') +
+      ', the skills most likely to differentiate you are in ' + top3.slice(0, 2).map(function(x) { return x.rec.title; }).join(' and ') + '. ' +
+      'These areas scored highest because they align across multiple dimensions of your profile: major relevance, career goal fit, and skill gaps.';
+
+    // Skill gaps
+    var gaps = findGaps(inputs);
+    var gapsList = document.getElementById('gaps-list');
+    gapsList.innerHTML = '';
+    if (gaps.length === 0) {
+      gapsList.innerHTML = '<li><span class="no-gaps-note">Your completed coursework covers the key prerequisite areas for your career goal. Focus on depth and specialization.</span></li>';
+    } else {
+      gaps.forEach(function(gap) {
+        gapsList.innerHTML += '<li><span class="gap-dot"></span>' + gap + '</li>';
+      });
+    }
+
+    // Next action
+    var topDetail = REC_DETAILS[top3[0].rec.id];
+    document.getElementById('next-action-text').textContent = topDetail ? topDetail.action : 'Discuss your top recommended areas with your academic advisor to identify electives that fit your remaining requirements.';
+
+    // Show results
+    var resultsEl = document.getElementById('results-section');
+    resultsEl.style.display = 'block';
+    resultsEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+</script>
+
+</body>
+</html>

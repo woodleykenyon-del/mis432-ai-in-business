@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Part 2: Course Description A/B Test &mdash; MIS 432 Exam 1</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../../assets/css/styles.css" />
+  <style>
+    /* ── PAGE-SPECIFIC STYLES ── */
+
+    .content-section {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 2.75rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .content-section:last-of-type { border-bottom: none; }
+
+    .section-label {
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 1.25rem;
+    }
+
+    .content-section h2 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      letter-spacing: -0.015em;
+      margin-bottom: 1rem;
+      color: var(--text);
+    }
+
+    .content-section p {
+      font-size: 0.97rem;
+      color: #374151;
+      line-height: 1.8;
+      margin-bottom: 1rem;
+      max-width: 720px;
+    }
+
+    .content-section p:last-child { margin-bottom: 0; }
+
+    /* Scenario cards */
+    .version-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+      margin-top: 1.25rem;
+    }
+
+    .version-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+    }
+
+    .version-card.treatment {
+      border-color: var(--accent);
+      background: var(--accent-light);
+    }
+
+    .version-label {
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.6rem;
+    }
+
+    .version-card.treatment .version-label {
+      color: var(--accent);
+    }
+
+    .version-card h3 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+      color: var(--text);
+    }
+
+    .course-example {
+      font-size: 0.85rem;
+      color: #374151;
+      line-height: 1.7;
+      padding: 0.75rem;
+      background: rgba(255,255,255,0.7);
+      border-radius: 5px;
+      border: 1px solid var(--border);
+    }
+
+    .course-example.version-b ul {
+      padding-left: 1.1rem;
+      margin-top: 0.35rem;
+    }
+
+    .course-example.version-b li {
+      margin-bottom: 0.2rem;
+    }
+
+    .prob-row {
+      margin-top: 0.75rem;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
+    .prob-row strong {
+      color: var(--text);
+    }
+
+    /* Sim params table */
+    .param-table {
+      width: 100%;
+      max-width: 480px;
+      border-collapse: collapse;
+      margin-top: 1rem;
+      font-size: 0.88rem;
+    }
+
+    .param-table th {
+      text-align: left;
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding: 0.5rem 0.75rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .param-table td {
+      padding: 0.55rem 0.75rem;
+      border-bottom: 1px solid var(--border);
+      color: #374151;
+    }
+
+    .param-table td:first-child { color: var(--muted); font-size: 0.83rem; }
+    .param-table td:last-child { font-weight: 600; font-family: 'DM Mono', monospace; color: var(--text); }
+
+    /* Run button */
+    .run-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius);
+      padding: 0.75rem 1.75rem;
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+      margin-top: 1rem;
+    }
+
+    .run-btn:hover { background: #163256; transform: translateY(-1px); }
+    .run-btn:active { transform: translateY(0); }
+
+    /* Results area */
+    #results-area {
+      display: none;
+      margin-top: 2rem;
+    }
+
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(165px, 1fr));
+      gap: 1rem;
+      margin-top: 0.5rem;
+    }
+
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem 1.5rem;
+    }
+
+    .stat-card.highlight {
+      border-color: var(--accent);
+      background: var(--accent-light);
+    }
+
+    .stat-label {
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.4rem;
+    }
+
+    .stat-card.highlight .stat-label { color: var(--accent); }
+
+    .stat-value {
+      font-size: 1.9rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      line-height: 1;
+      margin-bottom: 0.3rem;
+      font-family: 'DM Mono', monospace;
+    }
+
+    .stat-value.positive { color: #059669; }
+    .stat-value.significant { color: #2563eb; }
+
+    .stat-note {
+      font-size: 0.76rem;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    /* Decision box */
+    .decision-box {
+      margin-top: 1.5rem;
+      border-radius: var(--radius);
+      padding: 1.25rem 1.5rem;
+    }
+
+    .decision-box.significant {
+      background: #f0fdf4;
+      border: 1px solid #86efac;
+    }
+
+    .decision-box.not-significant {
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+    }
+
+    .decision-label {
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #059669;
+      margin-bottom: 0.5rem;
+    }
+
+    .decision-box.not-significant .decision-label { color: #d97706; }
+
+    .decision-text {
+      font-size: 0.95rem;
+      color: #374151;
+      line-height: 1.7;
+      margin: 0;
+    }
+
+    /* Chart */
+    .chart-section {
+      margin-top: 2rem;
+    }
+
+    .chart-title {
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 1rem;
+    }
+
+    #chart-wrap {
+      display: flex;
+      justify-content: center;
+    }
+
+    /* Interpretation box */
+    .interp-box {
+      background: var(--accent-light);
+      border: 1px solid #c3d4e5;
+      border-radius: var(--radius);
+      padding: 1.25rem 1.5rem;
+      margin-top: 1.25rem;
+    }
+
+    .interp-box-label {
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+    }
+
+    .interp-box p {
+      font-size: 0.9rem;
+      color: #374151;
+      line-height: 1.7;
+      margin: 0;
+      max-width: none;
+    }
+
+    /* Gap warning */
+    .gap-warning {
+      background: #fefce8;
+      border: 1px solid #fde047;
+      border-radius: var(--radius);
+      padding: 1.25rem 1.5rem;
+      margin-top: 1.25rem;
+    }
+
+    .gap-warning-label {
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #854d0e;
+      margin-bottom: 0.5rem;
+    }
+
+    .gap-warning p {
+      font-size: 0.9rem;
+      color: #713f12;
+      line-height: 1.7;
+      margin: 0;
+      max-width: none;
+    }
+
+    /* Reflection */
+    .reflection-text {
+      font-size: 0.97rem;
+      color: #374151;
+      line-height: 1.85;
+      max-width: 720px;
+    }
+
+    .reflection-text p + p { margin-top: 1rem; }
+
+    /* Process note */
+    .process-note {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem 1.5rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    .process-note strong { color: var(--text); }
+
+    /* Footer links */
+    .exam1-footer-link { color: var(--accent); }
+
+    @media (max-width: 600px) {
+      .version-grid { grid-template-columns: 1fr; }
+      .stat-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="site-nav">
+  <span class="nav-brand">MIS 432 &mdash; AI in Business</span>
+  <a href="../../index.html" class="nav-back">&larr; Back to Portfolio</a>
+</nav>
+
+<header class="page-header">
+  <div class="tag">Exam 1 &mdash; Part 2</div>
+  <h1>Course Description A/B Test</h1>
+  <p class="subtitle">
+    A simulation-based experiment comparing two course description formats during university registration. Which format leads more students to express enrollment intent?
+  </p>
+</header>
+
+<!-- ── SCENARIO ── -->
+<div class="content-section">
+  <div class="section-label">Scenario</div>
+  <h2>What we are testing</h2>
+  <p>
+    A university is evaluating two formats for course descriptions shown during online registration. Version A presents information as a traditional paragraph, which is the current default. Version B uses a bullet-point format that highlights key learning outcomes at the top. The goal is to determine which format leads more students to click "Add to Plan," which the university uses as a proxy for enrollment intent.
+  </p>
+
+  <div class="version-grid">
+    <div class="version-card">
+      <div class="version-label">Version A &mdash; Control</div>
+      <h3>Traditional Paragraph Format</h3>
+      <div class="course-example">
+        <strong>MIS 320: Database Systems</strong><br/>
+        This course introduces students to the principles of relational database design, SQL querying, and data management for business applications. Students will work with industry-standard tools and develop skills in organizing, retrieving, and analyzing structured data. Recommended for students interested in information systems or data-intensive careers.
+      </div>
+      <div class="prob-row">Assumed conversion rate: <strong>12%</strong></div>
+    </div>
+
+    <div class="version-card treatment">
+      <div class="version-label">Version B &mdash; Treatment</div>
+      <h3>Bullet-Point Outcomes Format</h3>
+      <div class="course-example version-b">
+        <strong>MIS 320: Database Systems</strong><br/>
+        You will learn to:
+        <ul>
+          <li>Design relational databases using ER diagrams</li>
+          <li>Write SQL queries to extract and analyze data</li>
+          <li>Apply database skills to real business problems</li>
+        </ul>
+        Recommended for: MIS, Business Analytics, Data-focused careers.
+      </div>
+      <div class="prob-row">Assumed conversion rate: <strong>17%</strong></div>
+    </div>
+  </div>
+
+  <p style="margin-top:1.5rem;">
+    The 5-percentage-point difference in assumed conversion rates reflects the hypothesis that students respond better to specific, scannable outcomes than to dense paragraphs. The simulation tests whether that difference, if observed in data, would be statistically meaningful.
+  </p>
+</div>
+
+<!-- ── SIMULATION SETUP ── -->
+<div class="content-section">
+  <div class="section-label">Simulation Setup</div>
+  <h2>Parameters and methodology</h2>
+  <p>
+    This simulation uses a seeded random number generator so the results are stable and reproducible on every page load. Two groups of 500 students each are independently simulated. Each student in Group A is assigned a click outcome based on a 12% probability; each student in Group B is assigned a click outcome based on a 17% probability.
+  </p>
+  <p>
+    The statistical test is a two-proportion z-test, which compares the two observed conversion rates and calculates the probability of seeing a difference this large if there were truly no difference between the formats. A p-value below 0.05 is used as the threshold for statistical significance.
+  </p>
+
+  <table class="param-table">
+    <thead>
+      <tr><th>Parameter</th><th>Value</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Total simulated students</td><td>1,000</td></tr>
+      <tr><td>Students per group</td><td>500</td></tr>
+      <tr><td>Version A conversion probability</td><td>12%</td></tr>
+      <tr><td>Version B conversion probability</td><td>17%</td></tr>
+      <tr><td>Random seed</td><td>42 (Mulberry32)</td></tr>
+      <tr><td>Statistical test</td><td>Two-proportion z-test</td></tr>
+      <tr><td>Significance threshold (&alpha;)</td><td>0.05</td></tr>
+    </tbody>
+  </table>
+
+  <button class="run-btn" id="run-btn" onclick="runABTest()">
+    Run A/B Test Simulation
+  </button>
+
+  <!-- Results appear here after clicking -->
+  <div id="results-area">
+
+    <div class="stat-grid" style="margin-top:1.75rem;" id="stat-grid">
+      <!-- Populated by JS -->
+    </div>
+
+    <div id="decision-box"></div>
+
+    <div class="chart-section">
+      <div class="chart-title">Conversion Rate Comparison</div>
+      <div id="chart-wrap"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── INTERPRETATION ── -->
+<div class="content-section">
+  <div class="section-label">Statistical Interpretation</div>
+  <h2>What the numbers mean</h2>
+  <p>
+    The p-value tells you how likely it would be to observe a gap this large between the two groups purely by chance, assuming no real difference exists. A p-value below 0.05 means that kind of chance gap would happen fewer than 5% of the time, which is the conventional threshold for calling a result statistically significant.
+  </p>
+  <p>
+    If the simulation returns a p-value below 0.05, it means the bullet-point format appears to meaningfully outperform the paragraph format for driving enrollment intent. The difference is unlikely to be noise.
+  </p>
+  <p>
+    If the p-value is close to but not below 0.05, the result is borderline. The simulation would not strongly support a rollout decision, and collecting more data would be the better path.
+  </p>
+
+  <div class="interp-box">
+    <div class="interp-box-label">About the z-statistic</div>
+    <p>The z-statistic measures how many standard errors apart the two conversion rates are. Larger absolute values indicate a more meaningful difference. A z-statistic above 1.96 corresponds to a two-tailed p-value below 0.05.</p>
+  </div>
+
+  <div class="gap-warning">
+    <div class="gap-warning-label">The Prediction-Decision Gap</div>
+    <p>
+      Even a statistically significant result does not automatically tell the university to change every course description. Statistical significance only answers one question: is this difference likely real? It does not answer whether the difference is large enough to justify a catalog-wide rollout, whether the effect persists across all subject areas and student populations, or whether a higher "Add to Plan" click rate actually leads to higher enrollment, better persistence, or improved student outcomes. The university would still need human judgment to weigh the cost of re-formatting thousands of descriptions against the potential benefit, and to consider whether the format alone drives the difference or whether something else (like the example course or the specific wording) accounts for it. A significant prediction is a reason to take the question seriously, not a reason to stop asking it.
+    </p>
+  </div>
+</div>
+
+<!-- ── REFLECTION ── -->
+<div class="content-section">
+  <div class="section-label">Reflection</div>
+  <h2>Process and limitations</h2>
+  <div class="reflection-text">
+    <p>
+      I built a simulated A/B test for a university course registration decision. The test compares a traditional paragraph course description against a bullet-point format with key outcomes highlighted. I used a simulated sample of 1,000 students, split evenly between control and treatment, then measured which format led to higher enrollment intent. After the first version was generated, I adjusted the scenario to make it more specific to a university context and made the output explain the business decision instead of only showing numbers.
+    </p>
+    <p>
+      This experiment is useful, but it does not capture everything a real university would need to know. A real test would need to account for course popularity, instructor reputation, time conflicts, major requirements, and whether students actually enroll later instead of just clicking interest in the moment. Even if the result is statistically significant, the prediction-decision gap still applies because a better click rate is not automatically the same thing as a better academic outcome. The university would still need human judgment before changing every course description format across the catalog.
+    </p>
+  </div>
+</div>
+
+<!-- ── PROCESS NOTE ── -->
+<div class="content-section">
+  <div class="section-label">Process Note</div>
+  <h2>How this artifact was built</h2>
+  <div class="process-note">
+    <strong>GenAI tool used:</strong> Claude Code<br/>
+    <strong>Process:</strong> I used Claude Code to generate the HTML/JS prototype, then reviewed the logic, scenario, and output language to make sure it matched the course concepts.
+  </div>
+</div>
+
+<!-- ── FOOTER ── -->
+<footer class="site-footer">
+  <span>MIS 432: AI in Business &mdash; Western Washington University</span>
+  <span>
+    <a class="exam1-footer-link" href="../index.html">Exam 1 Landing</a>
+    &nbsp;&middot;&nbsp;
+    <a class="exam1-footer-link" href="../../index.html">Portfolio Homepage</a>
+  </span>
+</footer>
+
+<script>
+  // ── SEEDED RANDOM NUMBER GENERATOR (Mulberry32) ──
+  // Returns a function that produces a deterministic sequence of [0, 1) floats.
+  function mulberry32(seed) {
+    return function() {
+      seed |= 0;
+      seed = (seed + 0x6D2B79F5) | 0;
+      var t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  // ── NORMAL CDF APPROXIMATION (Abramowitz and Stegun 26.2.17) ──
+  // Maximum error: ~7.5e-8. Accurate enough for reporting p-values to 3 decimal places.
+  function normalCDF(z) {
+    var p  = 0.2316419;
+    var a1 =  0.319381530;
+    var a2 = -0.356563782;
+    var a3 =  1.781477937;
+    var a4 = -1.821255978;
+    var a5 =  1.330274429;
+    var absZ = Math.abs(z);
+    var t = 1.0 / (1.0 + p * absZ);
+    var pdf = Math.exp(-0.5 * absZ * absZ) / Math.sqrt(2 * Math.PI);
+    var poly = ((((a5 * t + a4) * t + a3) * t + a2) * t + a1) * t;
+    var cdf = 1.0 - pdf * poly;
+    return z >= 0 ? cdf : 1.0 - cdf;
+  }
+
+  // Two-tailed p-value from z-statistic
+  function pValueTwoTailed(z) {
+    return 2.0 * (1.0 - normalCDF(Math.abs(z)));
+  }
+
+  // ── SIMULATE BERNOULLI TRIALS ──
+  // Returns the number of "successes" in n trials each with probability p.
+  function simulateBernoulli(rand, n, p) {
+    var successes = 0;
+    for (var i = 0; i < n; i++) {
+      if (rand() < p) successes++;
+    }
+    return successes;
+  }
+
+  // ── TWO-PROPORTION Z-TEST ──
+  // Tests whether two observed conversion rates come from populations with the same true rate.
+  // Uses the pooled proportion under the null hypothesis that pA == pB.
+  function twoProportionZTest(nA, kA, nB, kB) {
+    var pA = kA / nA;
+    var pB = kB / nB;
+    var pPool = (kA + kB) / (nA + nB);
+    var se = Math.sqrt(pPool * (1 - pPool) * (1 / nA + 1 / nB));
+    if (se === 0) return 0;
+    return (pB - pA) / se;
+  }
+
+  // ── INLINE SVG BAR CHART ──
+  // Draws a two-bar comparison chart; no external libraries required.
+  function buildBarChart(rateA, rateB) {
+    var W = 320, H = 230;
+    var padL = 45, padR = 25, padT = 25, padB = 55;
+    var chartW = W - padL - padR;
+    var chartH = H - padT - padB;
+    var axisMax = 0.25; // fixed 25% ceiling; appropriate for 10-20% conversion rates
+    var barW = 70;
+    // Center two bars with a gap between them
+    var totalBarW = 2 * barW + 60;
+    var startX = padL + (chartW - totalBarW) / 2;
+    var x1 = startX;
+    var x2 = startX + barW + 60;
+    var yBase = padT + chartH;
+
+    var hA = Math.min(rateA / axisMax, 1) * chartH;
+    var hB = Math.min(rateB / axisMax, 1) * chartH;
+    var yA = yBase - hA;
+    var yB = yBase - hB;
+
+    // Grid lines and y-axis labels at 0, 5, 10, 15, 20, 25%
+    var gridLines = '';
+    [0, 0.05, 0.10, 0.15, 0.20, 0.25].forEach(function(v) {
+      var y = yBase - (v / axisMax) * chartH;
+      var pct = Math.round(v * 100);
+      gridLines +=
+        '<line x1="' + padL + '" y1="' + y + '" x2="' + (W - padR) + '" y2="' + y +
+        '" stroke="#e5e7eb" stroke-width="1"/>' +
+        '<text x="' + (padL - 6) + '" y="' + (y + 4) + '" text-anchor="end" font-size="10" fill="#9ca3af">' + pct + '%</text>';
+    });
+
+    return '<svg viewBox="0 0 ' + W + ' ' + H + '" xmlns="http://www.w3.org/2000/svg"' +
+      ' style="width:100%;max-width:360px;display:block;margin:0 auto;overflow:visible">' +
+      gridLines +
+      // Axes
+      '<line x1="' + padL + '" y1="' + padT + '" x2="' + padL + '" y2="' + yBase + '" stroke="#d1d5db" stroke-width="1.5"/>' +
+      '<line x1="' + padL + '" y1="' + yBase + '" x2="' + (W - padR) + '" y2="' + yBase + '" stroke="#d1d5db" stroke-width="1.5"/>' +
+      // Bar A
+      '<rect x="' + x1 + '" y="' + yA + '" width="' + barW + '" height="' + hA + '" rx="3" fill="#c3d4e5"/>' +
+      '<text x="' + (x1 + barW / 2) + '" y="' + (yA - 7) + '" text-anchor="middle" font-size="11" font-weight="600" fill="#374151">' +
+        (rateA * 100).toFixed(1) + '%</text>' +
+      '<text x="' + (x1 + barW / 2) + '" y="' + (yBase + 17) + '" text-anchor="middle" font-size="11" fill="#4b5563">Version A</text>' +
+      '<text x="' + (x1 + barW / 2) + '" y="' + (yBase + 30) + '" text-anchor="middle" font-size="9.5" fill="#9ca3af">(Control)</text>' +
+      // Bar B
+      '<rect x="' + x2 + '" y="' + yB + '" width="' + barW + '" height="' + hB + '" rx="3" fill="#1a3a5c"/>' +
+      '<text x="' + (x2 + barW / 2) + '" y="' + (yB - 7) + '" text-anchor="middle" font-size="11" font-weight="600" fill="#374151">' +
+        (rateB * 100).toFixed(1) + '%</text>' +
+      '<text x="' + (x2 + barW / 2) + '" y="' + (yBase + 17) + '" text-anchor="middle" font-size="11" fill="#4b5563">Version B</text>' +
+      '<text x="' + (x2 + barW / 2) + '" y="' + (yBase + 30) + '" text-anchor="middle" font-size="9.5" fill="#9ca3af">(Treatment)</text>' +
+      '</svg>';
+  }
+
+  // ── MAIN: RUN THE TEST ──
+  function runABTest() {
+    var rand = mulberry32(42);
+
+    var nA = 500, nB = 500;
+    var probA = 0.12, probB = 0.17;
+
+    // Simulate each group independently
+    var kA = simulateBernoulli(rand, nA, probA);
+    var kB = simulateBernoulli(rand, nB, probB);
+
+    var rateA = kA / nA;
+    var rateB = kB / nB;
+    var lift  = rateB - rateA;
+
+    // Statistical test
+    var z = twoProportionZTest(nA, kA, nB, kB);
+    var p = pValueTwoTailed(z);
+    var significant = p < 0.05;
+
+    // Build stat cards
+    var statGrid = document.getElementById('stat-grid');
+    statGrid.innerHTML =
+      statCard('Version A Users',   nA.toLocaleString(),             '', 'Students assigned to the traditional paragraph format') +
+      statCard('Version A Conversions', kA + ' / ' + nA,            '', 'Number who clicked "Add to Plan"') +
+      statCard('Version A Rate',    (rateA * 100).toFixed(1) + '%',  '', 'Observed enrollment intent rate') +
+      statCard('Version B Users',   nB.toLocaleString(),             '', 'Students assigned to the bullet-point format') +
+      statCard('Version B Conversions', kB + ' / ' + nB,            '', 'Number who clicked "Add to Plan"') +
+      statCard('Version B Rate',    (rateB * 100).toFixed(1) + '%',  'positive', 'Observed enrollment intent rate') +
+      statCard('Lift (B &minus; A)', (lift >= 0 ? '+' : '') + (lift * 100).toFixed(1) + ' pp', lift >= 0 ? 'positive' : '', 'Percentage point difference in conversion rates') +
+      statCard('Z-statistic',       z.toFixed(3),                    significant ? 'significant' : '', 'Measures how many standard errors apart the rates are') +
+      statCard('p-value',           p < 0.001 ? '< 0.001' : p.toFixed(4), significant ? 'significant' : '', 'Probability of this gap by chance alone (threshold: 0.05)');
+
+    // Decision box
+    var decisionEl = document.getElementById('decision-box');
+    if (significant) {
+      decisionEl.innerHTML =
+        '<div class="decision-box significant">' +
+        '<div class="decision-label">Decision: Statistically Significant</div>' +
+        '<p class="decision-text">Version B converted at <strong>' + (rateB * 100).toFixed(1) + '%</strong> versus <strong>' + (rateA * 100).toFixed(1) + '%</strong> for Version A, a difference of <strong>' + (lift * 100).toFixed(1) + ' percentage points</strong>. With a p-value of <strong>' + p.toFixed(4) + '</strong>, this result is statistically significant. The bullet-point format appears to drive meaningfully higher enrollment intent. The university should consider a broader rollout, while accounting for practical factors such as course type, student segment, and whether click intent translates to actual enrollment.</p>' +
+        '</div>';
+    } else {
+      decisionEl.innerHTML =
+        '<div class="decision-box not-significant">' +
+        '<div class="decision-label">Decision: Not Statistically Significant</div>' +
+        '<p class="decision-text">The observed difference of <strong>' + (lift * 100).toFixed(1) + ' pp</strong> does not reach the p &lt; 0.05 threshold (p = ' + p.toFixed(4) + '). This does not mean there is no difference, only that the evidence in this sample is not strong enough to rule out chance. Collecting a larger sample before making a rollout decision would be the appropriate next step.</p>' +
+        '</div>';
+    }
+
+    // Bar chart
+    document.getElementById('chart-wrap').innerHTML = buildBarChart(rateA, rateB);
+
+    // Show results
+    document.getElementById('results-area').style.display = 'block';
+
+    // Disable button after first run (results are deterministic)
+    var btn = document.getElementById('run-btn');
+    btn.textContent = 'Simulation Complete';
+    btn.disabled = true;
+    btn.style.opacity = '0.6';
+    btn.style.cursor = 'default';
+  }
+
+  // Helper: build a single stat card HTML string
+  function statCard(label, value, valueClass, note) {
+    return '<div class="stat-card">' +
+      '<div class="stat-label">' + label + '</div>' +
+      '<div class="stat-value' + (valueClass ? ' ' + valueClass : '') + '">' + value + '</div>' +
+      '<div class="stat-note">' + note + '</div>' +
+      '</div>';
+  }
+</script>
+
+</body>
+</html>
