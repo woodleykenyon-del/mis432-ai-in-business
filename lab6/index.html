@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lab 6 — Airbnb AI Systems Analysis | MIS 432</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --coral:       #FF5A5F;
+      --coral-dark:  #E04E53;
+      --coral-light: #FFF0F0;
+      --ink:         #222222;
+      --ink-muted:   #717171;
+      --ink-faint:   #AAAAAA;
+      --bg:          #FFFFFF;
+      --bg-soft:     #F7F7F7;
+      --rule:        #DDDDDD;
+      --shadow:      0 1px 4px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.05);
+      --radius:      12px;
+      --font:        -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.65;
+      font-size: 16px;
+    }
+
+    /* ── Nav ── */
+    .site-nav {
+      background: var(--bg);
+      border-bottom: 1px solid var(--rule);
+      padding: 0 2rem;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .nav-brand {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--coral);
+      text-decoration: none;
+      letter-spacing: -0.01em;
+    }
+    .nav-back {
+      font-size: 0.8rem;
+      color: var(--ink-muted);
+      text-decoration: none;
+    }
+    .nav-back:hover { color: var(--coral); }
+
+    /* ── Hero ── */
+    .hero {
+      background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+      color: white;
+      padding: 5rem 2rem 4rem;
+      text-align: center;
+    }
+    .hero-tag {
+      display: inline-block;
+      background: var(--coral);
+      color: white;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      padding: 4px 12px;
+      border-radius: 20px;
+      margin-bottom: 1.25rem;
+    }
+    .hero h1 {
+      font-size: clamp(1.7rem, 4vw, 2.6rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+      max-width: 760px;
+      margin: 0 auto 1rem;
+    }
+    .hero-sub {
+      font-size: 1rem;
+      color: rgba(255,255,255,0.65);
+      max-width: 600px;
+      margin: 0 auto 2rem;
+    }
+    .hero-meta {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      flex-wrap: wrap;
+    }
+    .hero-meta-item {
+      font-size: 0.8rem;
+      color: rgba(255,255,255,0.5);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .hero-meta-item strong {
+      display: block;
+      font-size: 0.9rem;
+      color: white;
+      font-weight: 600;
+      text-transform: none;
+      letter-spacing: 0;
+      margin-bottom: 2px;
+    }
+
+    /* ── Layout ── */
+    .container {
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
+
+    .content {
+      padding: 4rem 0;
+    }
+
+    /* ── Section headers ── */
+    .section {
+      margin-bottom: 4rem;
+    }
+    .section-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--coral);
+      margin-bottom: 0.5rem;
+    }
+    .section-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 1.25rem;
+      color: var(--ink);
+    }
+    .section-body {
+      color: var(--ink);
+      font-size: 0.97rem;
+      line-height: 1.75;
+    }
+    .section-body p + p {
+      margin-top: 0.9rem;
+    }
+
+    /* ── Cards ── */
+    .card {
+      background: var(--bg);
+      border: 1px solid var(--rule);
+      border-radius: var(--radius);
+      padding: 1.5rem 1.75rem;
+      box-shadow: var(--shadow);
+    }
+    .card + .card { margin-top: 1rem; }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1rem;
+      margin-top: 1.25rem;
+    }
+
+    .card-sm {
+      background: var(--bg-soft);
+      border: 1px solid var(--rule);
+      border-radius: 8px;
+      padding: 1.1rem 1.25rem;
+    }
+    .card-sm-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--ink-muted);
+      margin-bottom: 0.3rem;
+    }
+    .card-sm-value {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--ink);
+    }
+    .card-sm-arrow {
+      font-size: 0.85rem;
+      color: var(--coral);
+      margin-top: 0.2rem;
+    }
+
+    /* ── Executive summary callout ── */
+    .exec-summary {
+      background: var(--coral-light);
+      border-left: 4px solid var(--coral);
+      border-radius: 0 8px 8px 0;
+      padding: 1.5rem 1.75rem;
+      margin-top: 1.25rem;
+    }
+    .exec-summary p {
+      font-size: 0.97rem;
+      line-height: 1.75;
+      color: var(--ink);
+    }
+    .exec-summary p + p { margin-top: 0.75rem; }
+
+    /* ── Matching table ── */
+    .match-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1.25rem;
+      font-size: 0.9rem;
+    }
+    .match-table th {
+      text-align: left;
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--ink-muted);
+      padding: 0 1rem 0.6rem 1rem;
+      border-bottom: 2px solid var(--rule);
+    }
+    .match-table th:first-child { padding-left: 0; }
+    .match-table td {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--rule);
+      color: var(--ink);
+      vertical-align: top;
+    }
+    .match-table td:first-child { padding-left: 0; font-weight: 600; }
+    .match-table tr:last-child td { border-bottom: none; }
+    .match-arrow {
+      color: var(--coral);
+      font-weight: 700;
+      padding: 0 0.25rem;
+    }
+
+    /* ── Pricing breakdown ── */
+    .price-breakdown {
+      background: var(--bg-soft);
+      border: 1px solid var(--rule);
+      border-radius: var(--radius);
+      overflow: hidden;
+      margin-top: 1.25rem;
+    }
+    .price-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.75rem 1.5rem;
+      border-bottom: 1px solid var(--rule);
+      font-size: 0.92rem;
+    }
+    .price-row:last-child { border-bottom: none; }
+    .price-row.total {
+      background: var(--ink);
+      color: white;
+      font-weight: 700;
+    }
+    .price-label { color: inherit; }
+    .price-value { font-weight: 600; font-variant-numeric: tabular-nums; }
+    .price-value.negative { color: #E65100; }
+    .price-value.positive { color: #2E7D32; }
+    .price-row.total .price-value { color: white; font-size: 1.05rem; }
+
+    /* ── Key findings sidebar ── */
+    .findings-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-top: 1.25rem;
+    }
+    .finding-card {
+      background: var(--bg);
+      border: 1px solid var(--rule);
+      border-top: 3px solid var(--coral);
+      border-radius: 8px;
+      padding: 1.1rem 1.25rem;
+    }
+    .finding-num {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--coral);
+      line-height: 1;
+      margin-bottom: 0.5rem;
+    }
+    .finding-text {
+      font-size: 0.88rem;
+      color: var(--ink);
+      line-height: 1.55;
+    }
+
+    /* ── Letter ── */
+    .letter {
+      background: var(--bg-soft);
+      border: 1px solid var(--rule);
+      border-radius: var(--radius);
+      padding: 2rem 2.25rem;
+      margin-top: 1.25rem;
+      font-size: 0.97rem;
+      line-height: 1.8;
+    }
+    .letter p + p { margin-top: 1rem; }
+    .letter .salutation { font-weight: 700; margin-bottom: 1rem; }
+    .letter .sign-off { margin-top: 1.5rem; color: var(--ink-muted); font-size: 0.9rem; }
+
+    /* ── Support template ── */
+    .template-box {
+      background: #F0F4FF;
+      border: 1px solid #C7D2F0;
+      border-radius: 8px;
+      padding: 1.25rem 1.5rem;
+      margin-top: 1.25rem;
+      font-size: 0.88rem;
+      line-height: 1.7;
+      color: var(--ink);
+    }
+    .template-box strong { color: #3B4FC5; }
+
+    /* ── Economics table ── */
+    .econ-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1.25rem;
+      font-size: 0.9rem;
+    }
+    .econ-table th {
+      background: var(--ink);
+      color: white;
+      text-align: left;
+      padding: 0.65rem 1rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .econ-table td {
+      padding: 0.7rem 1rem;
+      border-bottom: 1px solid var(--rule);
+      color: var(--ink);
+    }
+    .econ-table tr:last-child td { border-bottom: none; font-weight: 700; }
+    .econ-table tr:nth-child(even) td { background: var(--bg-soft); }
+    .highlight-cell { color: var(--coral); font-weight: 700; }
+
+    /* ── Listing ── */
+    .listing-card {
+      background: var(--bg);
+      border: 1px solid var(--rule);
+      border-radius: var(--radius);
+      overflow: hidden;
+      margin-top: 1.25rem;
+      box-shadow: var(--shadow);
+    }
+    .listing-header {
+      background: var(--coral);
+      color: white;
+      padding: 0.65rem 1.25rem;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+    .listing-body { padding: 1.25rem 1.5rem; }
+    .listing-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 0.75rem;
+    }
+    .listing-desc {
+      font-size: 0.93rem;
+      color: var(--ink);
+      line-height: 1.75;
+    }
+
+    /* ── Insight block ── */
+    .insight {
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+      background: var(--bg-soft);
+      border: 1px solid var(--rule);
+      border-radius: 8px;
+      padding: 1.1rem 1.25rem;
+      margin-top: 1rem;
+    }
+    .insight-icon {
+      font-size: 1.3rem;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .insight-text {
+      font-size: 0.9rem;
+      line-height: 1.65;
+      color: var(--ink);
+    }
+    .insight-text strong { color: var(--ink); }
+
+    /* ── Divider ── */
+    .divider {
+      border: none;
+      border-top: 1px solid var(--rule);
+      margin: 3rem 0;
+    }
+
+    /* ── Inline tag ── */
+    .tag {
+      display: inline-block;
+      background: var(--bg-soft);
+      border: 1px solid var(--rule);
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 3px 10px;
+      color: var(--ink-muted);
+      margin-right: 0.4rem;
+      margin-bottom: 0.4rem;
+    }
+    .tag.coral {
+      background: var(--coral-light);
+      border-color: #FFBBBC;
+      color: var(--coral-dark);
+    }
+
+    /* ── Footer ── */
+    .site-footer {
+      background: var(--ink);
+      color: rgba(255,255,255,0.5);
+      text-align: center;
+      padding: 2rem 1.5rem;
+      font-size: 0.82rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .site-footer span { display: block; }
+
+    /* ── Responsive ── */
+    @media (max-width: 640px) {
+      .hero { padding: 3.5rem 1.25rem 3rem; }
+      .hero-meta { gap: 1.2rem; }
+      .content { padding: 2.5rem 0; }
+      .section { margin-bottom: 2.5rem; }
+      .letter { padding: 1.5rem 1.25rem; }
+      .match-table { font-size: 0.82rem; }
+      .site-footer { flex-direction: column; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="site-nav">
+  <a href="../index.html" class="nav-brand">MIS 432 — AI in Business</a>
+  <a href="../index.html" class="nav-back">← Back to Portfolio</a>
+</nav>
+
+<!-- ── Hero ── -->
+<div class="hero">
+  <div class="hero-tag">Lab 6</div>
+  <h1>Airbnb AI Systems Analysis:<br>New Host Evaluation in Valencia, Spain</h1>
+  <p class="hero-sub">Evaluating matching, Smart Pricing, model interpretability, GenAI content, and regulatory risk for a first-time host.</p>
+  <div class="hero-meta">
+    <div class="hero-meta-item"><strong>Host</strong>Scenario: Elena, Ruzafa</div>
+    <div class="hero-meta-item"><strong>Market</strong>Valencia, Spain</div>
+    <div class="hero-meta-item"><strong>Cap</strong>90-day annual limit</div>
+    <div class="hero-meta-item"><strong>Outcome</strong>Conservative hybrid approach</div>
+  </div>
+</div>
+
+<!-- ── Content ── -->
+<div class="container">
+<div class="content">
+
+  <!-- ── 1. Executive Summary ── -->
+  <div class="section">
+    <div class="section-label">Section 01</div>
+    <div class="section-title">Executive Summary</div>
+    <div class="exec-summary">
+      <p>This case study evaluates Airbnb's core AI systems through the lens of a specific hosting decision. The scenario: Elena, a first-time host in Ruzafa, Valencia, is considering whether to list her 2-bedroom apartment on Airbnb or rent it long-term.</p>
+      <p>I analyzed six dimensions of Airbnb's AI stack — matching and ranking, embedding-based positioning, Smart Pricing, model interpretability, GenAI listing content, and regulatory risk — and synthesized findings into a final host recommendation.</p>
+      <p>My recommendation is a conservative hybrid approach. Airbnb's AI systems are genuinely useful for discovery, pricing, and content, but they cannot remove the regulatory risk or guarantee demand in a market under increasing political and legal pressure. Elena should not build her primary income plan around the platform. If she tests Airbnb at all, she should do so with a defined exit threshold and a long-term rental alternative ready.</p>
+    </div>
+    <div style="margin-top: 1.25rem; display: flex; flex-wrap: wrap; gap: 0.4rem;">
+      <span class="tag coral">Matching Systems</span>
+      <span class="tag coral">Embeddings</span>
+      <span class="tag coral">Smart Pricing</span>
+      <span class="tag coral">Model Interpretability</span>
+      <span class="tag coral">GenAI Content</span>
+      <span class="tag coral">Regulatory Risk</span>
+    </div>
+  </div>
+
+  <hr class="divider" />
+
+  <!-- ── 2. Matching System Evaluation ── -->
+  <div class="section">
+    <div class="section-label">Section 02</div>
+    <div class="section-title">Matching System Evaluation</div>
+    <div class="section-body">
+      <p>Airbnb is a two-sided marketplace: guests arrive with intent, listings exist with attributes, and the platform must connect them efficiently. The challenge is asymmetry. Guests use vague, natural-language search — "cozy place near restaurants," "good for remote work," "something calm" — while listings are described with inconsistent detail and structure. The matching system has to infer what a guest actually wants and rank listings by likely fit, not just keyword overlap.</p>
+      <p>The matching pairs below illustrate how intent signals map to listing characteristics. Each pairing reflects inferred guest type, not just price or bedroom count.</p>
+    </div>
+
+    <table class="match-table">
+      <thead>
+        <tr>
+          <th>Guest</th>
+          <th></th>
+          <th>Matched Listing</th>
+          <th>Inferred Signal</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Martins family</td>
+          <td class="match-arrow">→</td>
+          <td>Beachfront villa, 3BR</td>
+          <td>Space, safety, amenities, proximity to beach</td>
+        </tr>
+        <tr>
+          <td>Jake (backpacker)</td>
+          <td class="match-arrow">→</td>
+          <td>Shared room, El Carmen</td>
+          <td>Low cost, social, central, flexible</td>
+        </tr>
+        <tr>
+          <td>Dr. Patel</td>
+          <td class="match-arrow">→</td>
+          <td>Elegant flat, historic quarter</td>
+          <td>Professional, quiet, quality furnishings</td>
+        </tr>
+        <tr>
+          <td>Léa and Marco</td>
+          <td class="match-arrow">→</td>
+          <td>Cozy loft, Ruzafa</td>
+          <td>Couple travel, neighborhood, local character</td>
+        </tr>
+        <tr>
+          <td>Sofia (digital nomad)</td>
+          <td class="match-arrow">→</td>
+          <td>Modern studio, city center</td>
+          <td>Wifi, desk, flexible stay, walkability</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="insight" style="margin-top: 1.25rem;">
+      <div class="insight-icon">💡</div>
+      <div class="insight-text">
+        <strong>My analysis:</strong> Airbnb's matching system is not simply pairing bedrooms and price ranges. It is inferring intent from incomplete guest signals and ranking listings based on likely fit. For a new host like Elena, this has a direct consequence: early visibility depends on whether Airbnb can quickly understand what type of guest her listing actually serves. A listing that is unclear about its audience — or that tries to appeal to everyone — will underperform in ranking until the system accumulates behavioral data that reveals its true fit.
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider" />
+
+  <!-- ── 3. Embedding and Positioning ── -->
+  <div class="section">
+    <div class="section-label">Section 03</div>
+    <div class="section-title">Embedding and Positioning Analysis</div>
+    <div class="section-body">
+      <p>Embedding systems represent listings as vectors in high-dimensional space. Listings that attract similar guests, generate similar behavioral signals, and share comparable attributes end up close together in that space. The implication for hosts is that positioning is not just marketing — it determines which cluster your listing is placed in, and therefore which guests are likely to see it at all.</p>
+      <p><strong>My positioning choice: Remote work and digital nomad.</strong></p>
+      <p>Elena's apartment already has the attributes that define this cluster: fast wifi, a dedicated desk, a Ruzafa location with walkable cafés and restaurants, a rooftop terrace, and year-round availability. Positioning for remote workers moves her away from competing directly with other 2-bedroom units and into a cluster of studios, lofts, and work-friendly apartments — a segment that skews toward longer stays, weekday bookings, and repeat guests.</p>
+    </div>
+
+    <div class="card-grid" style="margin-top: 1.25rem;">
+      <div class="card-sm">
+        <div class="card-sm-label">Fast Wifi</div>
+        <div class="card-sm-value">Work-from-anywhere signal</div>
+        <div class="card-sm-arrow">→ nomad cluster</div>
+      </div>
+      <div class="card-sm">
+        <div class="card-sm-label">Dedicated Desk</div>
+        <div class="card-sm-value">Productivity infrastructure</div>
+        <div class="card-sm-arrow">→ nomad cluster</div>
+      </div>
+      <div class="card-sm">
+        <div class="card-sm-label">Ruzafa Neighborhood</div>
+        <div class="card-sm-value">Cafés, food, local energy</div>
+        <div class="card-sm-arrow">→ lifestyle + work balance</div>
+      </div>
+      <div class="card-sm">
+        <div class="card-sm-label">Rooftop Terrace</div>
+        <div class="card-sm-value">Premium differentiator</div>
+        <div class="card-sm-arrow">→ longer stay justification</div>
+      </div>
+      <div class="card-sm">
+        <div class="card-sm-label">Year-Round Availability</div>
+        <div class="card-sm-value">Stable supply signal</div>
+        <div class="card-sm-arrow">→ consistent ranking</div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top: 1.5rem;">
+      <div style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-muted); margin-bottom: 0.75rem;">LinkedIn Analogy</div>
+      <p style="font-size: 0.93rem; line-height: 1.75; color: var(--ink);">Two candidates can have nearly identical resumes but receive very different recruiter visibility — because the algorithm clusters profiles based on skills, keywords, engagement history, role trajectory, and recruiter click behavior. A profile that says "experienced professional in multiple areas" may rank below one that says "product manager, B2C SaaS, 0→1 stage" because the more specific signal clusters more tightly with what recruiters are searching for. To improve visibility, the right move is to make the profile signals more specific and more consistent with the target role — not more comprehensive. The same logic applies to Elena's listing.</p>
+    </div>
+  </div>
+
+  <hr class="divider" />
+
+  <!-- ── 4. Smart Pricing Evaluation ── -->
+  <div class="section">
+    <div class="section-label">Section 04</div>
+    <div class="section-title">Smart Pricing Evaluation</div>
+    <div class="section-body">
+      <p>Smart Pricing is Airbnb's demand-based dynamic pricing system. It adjusts nightly rates in real time based on market cluster, season, day of week, lead time, local events, and competing supply. For a new host with no prior pricing history, it provides a useful starting baseline. But it should be treated as a tool, not a rule.</p>
+    </div>
+
+    <div class="card-grid">
+      <div class="card-sm">
+        <div class="card-sm-label">Normal weekday</div>
+        <div class="card-sm-value">Accept Smart Pricing</div>
+        <div class="card-sm-arrow">Baseline is appropriate</div>
+      </div>
+      <div class="card-sm">
+        <div class="card-sm-label">High-demand festival or event</div>
+        <div class="card-sm-value">Consider overriding upward</div>
+        <div class="card-sm-arrow">Platform may underprice scarcity</div>
+      </div>
+      <div class="card-sm">
+        <div class="card-sm-label">Last-minute open date</div>
+        <div class="card-sm-value">Accept discount</div>
+        <div class="card-sm-arrow">Occupancy goal over rate</div>
+      </div>
+      <div class="card-sm">
+        <div class="card-sm-label">Peak weekend</div>
+        <div class="card-sm-value">Review manually first</div>
+        <div class="card-sm-arrow">Verify before accepting</div>
+      </div>
+      <div class="card-sm">
+        <div class="card-sm-label">Oversupplied slow season</div>
+        <div class="card-sm-value">Use carefully</div>
+        <div class="card-sm-arrow">Compare vs. long-term economics</div>
+      </div>
+    </div>
+
+    <div class="insight" style="margin-top: 1.25rem;">
+      <div class="insight-icon">⚠️</div>
+      <div class="insight-text">
+        <strong>My analysis:</strong> Smart Pricing is valuable because it adjusts for factors a new host cannot easily track manually — cluster demand, competitor availability, event calendars, and booking lead time. But it optimizes for platform booking probability and Airbnb-side host revenue. It does not account for Elena's full financial picture, her regulatory exposure, or her long-term rental alternative. Blindly following Smart Pricing means outsourcing a business decision to a system that does not have all the relevant inputs.
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider" />
+
+  <!-- ── 5. Support Escalation Response ── -->
+  <div class="section">
+    <div class="section-label">Section 05</div>
+    <div class="section-title">Support Escalation Response</div>
+    <div class="section-body">
+      <p>Maria is a host who received a Smart Pricing suggestion of €62 for a Saturday night — significantly below her base rate — and escalated to support. This section documents the pricing breakdown, my direct response to her, and a reusable support template.</p>
+    </div>
+
+    <div class="price-breakdown">
+      <div class="price-row">
+        <span class="price-label">Base rate</span>
+        <span class="price-value">€82</span>
+      </div>
+      <div class="price-row">
+        <span class="price-label">Saturday premium</span>
+        <span class="price-value positive">+€18</span>
+      </div>
+      <div class="price-row">
+        <span class="price-label">Winter season adjustment</span>
+        <span class="price-value negative">−€15</span>
+      </div>
+      <div class="price-row">
+        <span class="price-label">Last-minute (tomorrow) discount</span>
+        <span class="price-value negative">−€18</span>
+      </div>
+      <div class="price-row">
+        <span class="price-label">Oversupply penalty (competing listings open)</span>
+        <span class="price-value negative">−€5</span>
+      </div>
+      <div class="price-row total">
+        <span class="price-label">Smart Pricing suggestion</span>
+        <span class="price-value">€62</span>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top: 1.5rem;">
+      <div style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--coral); margin-bottom: 0.75rem;">Direct Response to Maria</div>
+      <p style="font-size: 0.95rem; line-height: 1.8; color: var(--ink);">I understand why €62 feels wrong, especially for a Saturday. The system did apply a Saturday premium, but three factors pulled the rate back down: winter demand in your market is lower than the baseline, the booking date is tomorrow which puts you in last-minute pricing territory, and a number of similar listings nearby are still available tonight. Smart Pricing is trying to prevent an empty night — it is not saying your apartment is worth less than usual. That said, you can override it at any time. If you would rather hold your rate and accept the risk of an empty night, that is a completely valid decision.</p>
+    </div>
+
+    <div class="template-box">
+      <strong>Reusable Support Template — Smart Pricing Explanation</strong><br /><br />
+      Your Smart Pricing suggestion reflects a few factors working together:<br /><br />
+      <strong>Base rate</strong> — the platform's estimate of your listing's typical value in your market cluster.<br />
+      <strong>Season</strong> — demand in your area right now relative to the annual average.<br />
+      <strong>Day of week</strong> — weekends typically carry a premium; weekdays may not.<br />
+      <strong>Lead time</strong> — same-day or next-day dates receive a discount because booking probability drops significantly close to the date.<br />
+      <strong>Local events</strong> — high-demand dates near festivals or conferences may lift the suggestion; quiet periods may depress it.<br />
+      <strong>Competing supply</strong> — if many similar listings in your area are still open, the system adjusts downward to remain competitive.<br /><br />
+      You are never required to accept Smart Pricing. You can override the suggestion at any time from your calendar.
+    </div>
+
+    <div class="insight" style="margin-top: 1.25rem;">
+      <div class="insight-icon">🔍</div>
+      <div class="insight-text">
+        <strong>Reflection:</strong> A hybrid pricing model can explain why the price dropped — the inputs are interpretable and the math is traceable. But explainability does not answer the second question: whether Maria should accept €62 or hold her rate. That is a business judgment that depends on her personal goals, her risk tolerance, and what an empty night costs her. The model can inform the decision; it cannot make it.
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider" />
+
+  <!-- ── 6. GenAI Content Audit ── -->
+  <div class="section">
+    <div class="section-label">Section 06</div>
+    <div class="section-title">GenAI Content Audit</div>
+    <div class="section-body">
+      <p>Airbnb and many hosts use GenAI tools to draft listing copy. The risk is predictable: models trained on large datasets of listings tend to reproduce the phrases that are statistically common — which are also the phrases that have stopped working. "Hidden gem," "perfect getaway," "stunning views," "cozy retreat," and "chic apartment" appear across thousands of listings. A guest scanning search results cannot distinguish one from another.</p>
+      <p>The problem is not that AI-generated copy is wrong. It is that it is not specific enough to Elena's actual target guest, and it may describe the apartment in ways that attract the wrong audience — or attract nobody at all.</p>
+    </div>
+
+    <div class="listing-card" style="margin-top: 0.5rem;">
+      <div class="listing-header" style="background: var(--ink-muted);">First Draft — Generic AI Output (Before Editing)</div>
+      <div class="listing-body">
+        <div class="listing-title">Charming Hidden Gem in the Heart of Valencia</div>
+        <div class="listing-desc" style="color: var(--ink-muted); font-style: italic;">Discover this stunning, cozy apartment nestled in one of Valencia's most vibrant neighborhoods. Perfect for couples or small families looking for a memorable getaway, this beautifully renovated space offers everything you need for a perfect stay. Don't miss your chance to experience authentic Valencian living!</div>
+      </div>
+    </div>
+
+    <div class="insight" style="margin-top: 1rem;">
+      <div class="insight-icon">✏️</div>
+      <div class="insight-text"><strong>Critique:</strong> "Hidden gem," "stunning," "perfect getaway," and "authentic living" are filler phrases that apply to almost any listing. The copy does not mention the desk, the wifi speed, the rooftop, or who the apartment is actually good for. A digital nomad scanning listings would have no reason to click this over fifty similar descriptions.</div>
+    </div>
+
+    <div class="listing-card" style="margin-top: 1.25rem;">
+      <div class="listing-header">Final Listing — Edited for Specificity and Honesty</div>
+      <div class="listing-body">
+        <div class="listing-title">Ruzafa Remote-Work Flat with Rooftop Terrace</div>
+        <div class="listing-desc">Stay in a renovated 2-bedroom apartment in Ruzafa, one of Valencia's best neighborhoods for food, cafés, and local energy. The apartment works well for remote workers or couples who want more space than a studio, with fast wifi, a dedicated desk, a renovated kitchen, and access to a rooftop terrace with city views. You can walk to restaurants, cafés, and the beach in about 10 minutes. There is no parking or pool, so it is best for guests who plan to explore on foot, work during the day, and enjoy the neighborhood at night.</div>
+      </div>
+    </div>
+
+    <div class="insight" style="margin-top: 1rem;">
+      <div class="insight-icon">💡</div>
+      <div class="insight-text"><strong>Reflection:</strong> I revised the listing to be specific and honest. The final version names the apartment's real strengths — remote work infrastructure, Ruzafa, the rooftop — and is transparent about what it does not have. The risk of accepting AI-generated copy without editing is not just that it sounds generic. It is that it may attract guests who expect something the listing does not offer, which produces poor reviews and damages ranking more than a modest listing description would have.</div>
+    </div>
+  </div>
+
+  <hr class="divider" />
+
+  <!-- ── 7. Regulatory Risk Assessment ── -->
+  <div class="section">
+    <div class="section-label">Section 07</div>
+    <div class="section-title">Regulatory Risk Assessment</div>
+    <div class="section-body">
+      <p>Valencia has approximately 28,000 active Airbnb listings. Airbnb accounts for roughly 3.2% of the city's total housing stock. Average rent has increased 38% since 2019, and Valencia has enacted a 90-day annual cap on short-term rentals. The regulatory trajectory is toward tighter restrictions, not looser ones.</p>
+    </div>
+
+    <table class="econ-table">
+      <thead>
+        <tr>
+          <th>Scenario</th>
+          <th>Nightly Rate</th>
+          <th>Nights / Year</th>
+          <th>Gross Revenue</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Airbnb — below benchmark</td>
+          <td>€80</td>
+          <td>90</td>
+          <td>€7,200</td>
+        </tr>
+        <tr>
+          <td>Airbnb — at benchmark</td>
+          <td>€100</td>
+          <td>90</td>
+          <td>€9,000</td>
+        </tr>
+        <tr>
+          <td>Airbnb — break-even vs. long-term</td>
+          <td class="highlight-cell">~€120</td>
+          <td>90</td>
+          <td>€10,800</td>
+        </tr>
+        <tr>
+          <td>Long-term rental</td>
+          <td>—</td>
+          <td>365</td>
+          <td>€10,800 (€900/mo)</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="insight" style="margin-top: 1.25rem;">
+      <div class="insight-icon">⚖️</div>
+      <div class="insight-text">
+        <strong>My analysis:</strong> Under Valencia's 90-day cap, Airbnb only produces more gross revenue than long-term renting at approximately €120/night — before platform fees, cleaning costs, and management time. At €100/night, Airbnb earns Elena €1,800 less per year than a stable tenant, with higher variance and regulatory exposure. Barcelona is moving toward eliminating short-term rentals entirely. Valencia's cap is already a political compromise under pressure. Elena should not build a primary income plan around a regulatory environment that is moving against her.
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider" />
+
+  <!-- ── 8. Final Recommendation ── -->
+  <div class="section">
+    <div class="section-label">Section 08</div>
+    <div class="section-title">Final Recommendation</div>
+    <div class="section-body">
+      <p>A direct letter to Elena summarizing my recommendation based on the full analysis.</p>
+    </div>
+
+    <div class="letter">
+      <div class="salutation">Dear Elena,</div>
+      <p>I would not make Airbnb your primary income plan.</p>
+      <p>If you want to test the platform, use a limited hybrid strategy: concentrate your legal short-term bookings in the highest-demand months — late spring, summer, and major festival periods — position the listing clearly for remote workers and couples, and set a threshold before you begin. If your average nightly rate does not reliably clear approximately €120 after platform fees and costs, or if the regulatory environment tightens further, switch to long-term renting and do not look back.</p>
+      <p>Airbnb's AI systems can genuinely help you. The matching and ranking system will surface your listing to the right guests if your positioning is specific. Smart Pricing gives you a useful baseline for daily rate decisions. GenAI tools can produce a solid first draft of your listing copy. These are real advantages. But none of them remove the structural risk you are operating under: a 90-day cap, a political environment that is moving against short-term rentals, and an income ceiling that a long-term tenant already clears.</p>
+      <p>Long-term renting gives up some upside — particularly in peak summer weeks where Airbnb income could exceed the monthly equivalent. But it gives you something more valuable right now: steady, predictable income, no management burden, and no regulatory exposure. The hybrid path I am recommending gives you a test window without betting the apartment's entire economics on a platform and market that may become harder and more expensive to operate in.</p>
+      <p>My suggestion is to run Airbnb for one season with honest tracking. If you cannot average above €120/night at reasonable occupancy, the math does not work. Long-term renting is not a fallback — in this market, at this moment, it may simply be the better business decision.</p>
+      <div class="sign-off">Kenyon Woodley<br>MIS 432 — AI in Business Analysis</div>
+    </div>
+  </div>
+
+  <hr class="divider" />
+
+  <!-- ── 9. Key Findings ── -->
+  <div class="section">
+    <div class="section-label">Section 09</div>
+    <div class="section-title">Key Findings</div>
+    <div class="section-body">
+      <p>Four takeaways that generalize beyond Elena's specific situation.</p>
+    </div>
+
+    <div class="findings-grid">
+      <div class="finding-card">
+        <div class="finding-num">01</div>
+        <div class="finding-text">Elena's real competitors are defined by <strong>audience overlap</strong>, not bedroom count. A 2-bedroom remote-work apartment competes with studios and lofts, not other 2-bedroom family units.</div>
+      </div>
+      <div class="finding-card">
+        <div class="finding-num">02</div>
+        <div class="finding-text">Smart Pricing is explainable because it is a hybrid model — interpretable inputs, traceable math. But <strong>explainable does not mean always right</strong>. The model lacks Elena's full financial context.</div>
+      </div>
+      <div class="finding-card">
+        <div class="finding-num">03</div>
+        <div class="finding-text">GenAI can draft listing copy efficiently. But <strong>human editing is what produces reliability</strong> — removing filler phrases, adding specific attributes, and ensuring the listing describes what the apartment actually offers.</div>
+      </div>
+      <div class="finding-card">
+        <div class="finding-num">04</div>
+        <div class="finding-text">Under Valencia's 90-day cap, <strong>long-term rental income beats Airbnb at €100/night before costs</strong>. The break-even is approximately €120/night — a threshold that requires consistent peak-season performance.</div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /content -->
+</div><!-- /container -->
+
+<footer class="site-footer">
+  <span>MIS 432: AI in Business — Western Washington University</span>
+  <span>Kenyon Woodley</span>
+</footer>
+
+</body>
+</html>
