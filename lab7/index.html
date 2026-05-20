@@ -528,11 +528,8 @@
     <p>The agent must call all three tools before producing any ranked output. This prevents it from making assumptions about the candidate's background or inventing job postings from general knowledge.</p>
 
     <div class="screenshot-wrap">
-      <div class="screenshot-placeholder">
-        <div class="placeholder-icon">&#9638;</div>
-        Screenshot captured in n8n workflow logs.
-      </div>
-      <div class="screenshot-caption">n8n workflow canvas showing Chat Trigger, AI Agent, Anthropic Chat Model, and three tool nodes</div>
+      <img src="assets/workflow-canvas.png" alt="n8n workflow canvas showing Chat Trigger, AI Agent, Anthropic Chat Model, Job Feed, Job Search Parameters, and Candidate Profile nodes" />
+      <div class="screenshot-caption">n8n workflow canvas: Chat Trigger feeds the AI Agent, which calls Job Feed, Job Search Parameters, and Candidate Profile as tools via Claude Sonnet 4.6</div>
     </div>
 
     <h3>System Prompt: Key Rules</h3>
