@@ -1,0 +1,37 @@
+Find the best job opportunities for me this week. Rank them based on my profile, job search parameters, location flexibility, graduation timeline, and long-term career goals. Give me a prioritized application queue I could review from my phone while traveling abroad.
+
+Both tools returned successfully. Now I need to retrieve the Job Feed. However, I notice there is no Job Feed tool available in my current toolset — only Candidate Profile and Job Search Parameters have been provided. Let me flag this transparently.
+
+⚠️ Tool Check — Critical Issue
+Tool	Status	Result
+✅ Candidate Profile	Returned	Kenyon's full background, skills, internships (SpaceX, REI), target roles, and weak-fit signals
+✅ Job Search Parameters	Returned	Target roles, industries, locations, compensation preferences, scoring rules, and output format
+❌ Job Feed	Not available	No Job Feed tool is registered in this environment
+
+🚫 Job Feed Is Unavailable — Stopping Here
+Per my operating rules:
+
+"If the Job Feed tool does not return a jobs array, stop and say: 'The job feed is misconfigured or unavailable.' Do not invent job postings from general knowledge."
+
+The job feed is misconfigured or unavailable.
+
+I cannot rank, score, or recommend any job postings at this time because doing so would require me to invent job listings — which I will not do. Fabricated postings could send you after roles that are expired, misrepresented, or don't exist, which wastes your time while you're traveling.
+
+🔧 What Needs to Happen to Fix This
+Here's what would resolve the issue so I can run your full ranked queue:
+
+Issue	What's Needed
+No Job Feed tool registered	A Job Feed tool needs to be connected to this agent — typically pulling from a curated job board API, a Google Sheet of saved listings, a job aggregator like HiringCafe or Greenhouse, or a manually maintained feed
+Feed returns no jobs array	If a feed exists but returned empty, it needs to be checked for a properly structured jobs array in JSON format
+Feed is stale or misconfigured	If the feed was previously working, the data source or API connection may need to be refreshed
+
+✅ What I Can Do Right Now
+While you're traveling, here's how you can unblock this:
+
+Paste job listings directly into this chat. If you copy job postings from LinkedIn, a company careers page, or HiringCafe into this thread, I will immediately score, rank, and generate your prioritized application queue using your profile and search parameters — no Job Feed tool required.
+
+Share a list of companies or roles you've already found. I can evaluate any job description you provide against your SpaceX + REI background, sourcing skills, and fall 2026 timeline.
+
+Ask your technical contact to register the Job Feed tool so it returns a structured jobs array, and I'll be ready to run the full automated workflow on the next call.
+
+Your profile and search parameters are loaded and ready. The moment job data is available, I can produce your ranked queue instantly.

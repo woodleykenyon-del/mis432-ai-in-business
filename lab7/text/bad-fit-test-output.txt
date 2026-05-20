@@ -1,0 +1,42 @@
+✅ Tool Check
+
+Candidate Profile returned Kenyon's full background — supply chain/sourcing focus, SpaceX + REI internships, ASCM leadership, targeting early-career ops/procurement/supply chain roles in aerospace, defense, and hard-tech.
+Job Search Parameters returned Kenyon's scoring rules, target roles, preferred companies, location preferences, compensation floor (~$75K+), and the key rule that pure data/analytics roles are weak fits.
+Job Feed returned 8 jobs in sample/test mode. The role you submitted — Senior Data Scientist, Marketplace Optimization at Uber — is present in the feed as Job ID 7.
+
+🎯 Evaluation: Senior Data Scientist, Marketplace Optimization — Uber
+Field	Details
+Company	Uber
+Location	San Francisco, CA
+Salary	$130,000–$160,000
+Experience Required	Advanced technical / model deployment
+Source	LinkedIn (sample)
+Application Link	Manual verification required
+
+📊 Fit Score: 22 / 100
+🔴 Recommended Action: SKIP
+
+Why This Scores a 22
+Here is a breakdown of how this role lands across every scoring dimension:
+
+Scoring Dimension	Assessment	Score Impact
+Role fit	Pure data science / ML engineering role. Kenyon's target roles are sourcing, procurement, planning, and operations — not model deployment.	🔴 Major penalty
+Industry fit	Uber is a tech/marketplace company, not aerospace, defense, space, or advanced manufacturing. No supply chain function in scope.	🔴 Major penalty
+Seniority fit	Requires advanced technical experience including production model deployment. Kenyon is a May/June 2026 new grad.	🔴 Major penalty
+Skills alignment	Requires Python, ML, statistics, and experimentation at a production level. Kenyon's skills are Excel, SQL exposure, Tableau, cost modeling, and sourcing workflows — not machine learning.	🔴 Major penalty
+Location fit	San Francisco, CA is actually a valid location preference.	🟢 No penalty
+Compensation	$130K–$160K is strong, well above Kenyon's floor.	🟡 Positive signal, but irrelevant if the role isn't a fit
+Long-term career value	Taking a pure ML role would move Kenyon away from his target career track in supply chain, sourcing, and operations leadership. Even if he could qualify, it would be a career misdirection.	🔴 Strategic penalty
+Resume credibility	There is no credible path to claiming production ML deployment experience from his resume. Applying would likely be flagged immediately by a recruiter.	🔴 Major penalty
+
+⚠️ Key Concerns
+This is not Kenyon's career. Even setting aside qualifications, landing this role would pull him into a data science track at a ride-share company — the opposite direction from aerospace, defense, and supply chain leadership.
+He does not have the technical prerequisites. Production model deployment in Python and ML is a multi-year specialization. His SQL exposure and Tableau experience do not transfer here.
+Uber's brand does not compensate for the mismatch. Strong company, wrong role, wrong function, wrong industry for his goals.
+High salary is a trap signal here. The $130K–$160K range is genuinely attractive, but pursuing it would cost Kenyon positioning in the supply chain and aerospace market where his internships, credentials, and relationships are already built.
+
+📱 Phone-First Next Step
+None required — skip this role. Do not spend time on the application. If Uber is a company Kenyon finds interesting, the correct move would be to monitor Uber Freight, Uber for Business operations, or supply chain/logistics roles at Uber that align with his actual background — not marketplace data science.
+
+📋 Limitations
+This evaluation is based on sample/test data from the Job Feed. The Uber posting details, salary range, and application link require manual verification before any action is taken on live data.

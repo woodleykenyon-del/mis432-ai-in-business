@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lab 7: Agentic AI Job Scout | MIS 432</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:            #0c0c14;
+      --surface:       #141420;
+      --surface-alt:   #1c1c2c;
+      --border:        #2c2c3e;
+      --border-bright: #4a1a1a;
+      --crimson:       #8b1a1a;
+      --crimson-mid:   #b91c1c;
+      --crimson-glow:  rgba(139,26,26,0.15);
+      --text:          #e8e8f0;
+      --muted:         #8888a0;
+      --code-bg:       #0a0a12;
+      --radius:        8px;
+      --green:         #22c55e;
+      --red:           #ef4444;
+      --yellow:        #eab308;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      font-size: 16px;
+      line-height: 1.7;
+      min-height: 100vh;
+    }
+
+    a { color: #e07070; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* ── NAV ── */
+    .site-nav {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 1.2rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-back {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      transition: color 0.15s;
+    }
+    .nav-back:hover { color: var(--text); text-decoration: none; }
+    .nav-label {
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+
+    /* ── HERO ── */
+    .hero {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 4rem 1.5rem 3.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .hero-tag {
+      display: inline-block;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--crimson-mid);
+      background: var(--crimson-glow);
+      border: 1px solid var(--border-bright);
+      padding: 0.25rem 0.7rem;
+      border-radius: 3px;
+      margin-bottom: 1.4rem;
+    }
+    .hero h1 {
+      font-size: clamp(1.75rem, 4.5vw, 3rem);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -0.025em;
+      margin-bottom: 1rem;
+      color: #ffffff;
+    }
+    .hero h1 span { color: var(--crimson-mid); }
+    .hero .subtitle {
+      color: var(--muted);
+      font-size: 1rem;
+      max-width: 600px;
+      line-height: 1.8;
+      margin-bottom: 2rem;
+    }
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .meta-chip {
+      font-size: 0.75rem;
+      padding: 0.3rem 0.75rem;
+      border-radius: 3px;
+      background: var(--surface-alt);
+      border: 1px solid var(--border);
+      color: var(--muted);
+    }
+
+    /* ── CONTAINER ── */
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
+
+    /* ── SECTION ── */
+    .section {
+      padding: 3rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .section:last-child { border-bottom: none; }
+    .section-label {
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--crimson-mid);
+      margin-bottom: 0.75rem;
+    }
+    .section h2 {
+      font-size: clamp(1.2rem, 2.5vw, 1.65rem);
+      font-weight: 700;
+      letter-spacing: -0.015em;
+      margin-bottom: 1.25rem;
+      color: #ffffff;
+      line-height: 1.25;
+    }
+    .section h3 {
+      font-size: 1.05rem;
+      font-weight: 600;
+      margin: 1.75rem 0 0.75rem;
+      color: #d8d8e8;
+    }
+    .section p {
+      color: var(--muted);
+      margin-bottom: 1rem;
+      max-width: 720px;
+    }
+    .section p:last-child { margin-bottom: 0; }
+
+    /* ── TAKEAWAY CARDS ── */
+    .takeaway-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+    .takeaway-card {
+      background: var(--surface);
+      border: 1px solid var(--border-bright);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+    }
+    .takeaway-num {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: var(--crimson-mid);
+      line-height: 1;
+      margin-bottom: 0.4rem;
+      letter-spacing: -0.03em;
+    }
+    .takeaway-label {
+      font-size: 0.82rem;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    /* ── CARD ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .card-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .card-body {
+      font-size: 0.875rem;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    /* ── FLOW DIAGRAM ── */
+    .flow-diagram {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.75rem;
+      margin: 1.5rem 0;
+      overflow-x: auto;
+    }
+    .flow-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-bottom: 0.75rem;
+    }
+    .flow-row:last-child { margin-bottom: 0; }
+    .flow-node {
+      background: var(--surface-alt);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 0.5rem 0.9rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text);
+      white-space: nowrap;
+    }
+    .flow-node.trigger { border-color: #3b82f6; color: #93c5fd; }
+    .flow-node.agent { border-color: var(--crimson-mid); color: #fca5a5; }
+    .flow-node.model { border-color: #8b5cf6; color: #c4b5fd; }
+    .flow-node.tool { border-color: #22c55e; color: #86efac; }
+    .flow-arrow {
+      color: var(--muted);
+      font-size: 0.9rem;
+      flex-shrink: 0;
+    }
+    .flow-tools {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-top: 0.5rem;
+      margin-left: 2rem;
+    }
+
+    /* ── SCREENSHOT ── */
+    .screenshot-wrap {
+      margin: 1.5rem 0;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .screenshot-wrap img {
+      width: 100%;
+      display: block;
+    }
+    .screenshot-caption {
+      padding: 0.65rem 1rem;
+      font-size: 0.75rem;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+      font-style: italic;
+    }
+    .screenshot-placeholder {
+      padding: 2.5rem 1.5rem;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+    .screenshot-placeholder .placeholder-icon {
+      font-size: 1.75rem;
+      margin-bottom: 0.75rem;
+      opacity: 0.4;
+    }
+
+    /* ── CODE BLOCK ── */
+    .code-block {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--crimson);
+      border-radius: var(--radius);
+      padding: 1.25rem 1.5rem;
+      margin: 1.25rem 0;
+      overflow-x: auto;
+      font-family: 'SF Mono', 'Fira Code', 'Fira Mono', Consolas, monospace;
+      font-size: 0.8rem;
+      line-height: 1.7;
+      color: #c8c8e0;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .code-label {
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--crimson-mid);
+      margin-bottom: 0.4rem;
+    }
+
+    /* ── RANKED TABLE ── */
+    .table-wrap {
+      overflow-x: auto;
+      margin: 1.5rem 0;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8rem;
+    }
+    thead {
+      background: var(--surface-alt);
+    }
+    th {
+      padding: 0.75rem 0.9rem;
+      text-align: left;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    td {
+      padding: 0.7rem 0.9rem;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: var(--surface-alt); }
+    .score-high { color: var(--green); font-weight: 700; }
+    .score-mid  { color: var(--yellow); font-weight: 700; }
+    .score-low  { color: var(--red); font-weight: 700; }
+    .action-apply  { color: var(--green); font-weight: 600; }
+    .action-save   { color: var(--yellow); font-weight: 600; }
+    .action-skip   { color: var(--red); font-weight: 600; }
+    .company-name  { color: #ffffff; font-weight: 600; }
+
+    /* ── GOVERNANCE LIST ── */
+    .gov-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1rem;
+      margin-top: 1.25rem;
+    }
+    .gov-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-top: 3px solid var(--crimson);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+    }
+    .gov-card-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 0.6rem;
+    }
+    .gov-card-body {
+      font-size: 0.82rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* ── CALLOUT ── */
+    .callout {
+      background: var(--crimson-glow);
+      border: 1px solid var(--border-bright);
+      border-radius: var(--radius);
+      padding: 1.25rem 1.5rem;
+      margin: 1.25rem 0;
+      font-size: 0.9rem;
+      color: #e0c0c0;
+    }
+    .callout-label {
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--crimson-mid);
+      margin-bottom: 0.4rem;
+    }
+
+    /* ── STATUS ROW ── */
+    .status-row {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.6rem 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.85rem;
+    }
+    .status-row:last-child { border-bottom: none; }
+    .status-ok   { color: var(--green); font-size: 1rem; }
+    .status-fail { color: var(--red);   font-size: 1rem; }
+    .status-name { font-weight: 600; color: var(--text); min-width: 180px; }
+    .status-desc { color: var(--muted); }
+
+    /* ── FOOTER ── */
+    .site-footer {
+      max-width: 960px;
+      margin: 3rem auto 0;
+      padding: 1.75rem 1.5rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.78rem;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 640px) {
+      .takeaway-grid { grid-template-columns: 1fr 1fr; }
+      .gov-grid { grid-template-columns: 1fr; }
+      .flow-tools { margin-left: 0; }
+      .site-footer { flex-direction: column; }
+    }
+    @media (max-width: 400px) {
+      .takeaway-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Navigation -->
+<nav class="site-nav">
+  <a href="../index.html" class="nav-back">&#8592; MIS 432 Portfolio</a>
+  <span class="nav-label">Western Washington University</span>
+</nav>
+
+<!-- Hero -->
+<header class="hero">
+  <div class="hero-tag">Lab 7 &nbsp;&middot;&nbsp; Agentic AI</div>
+  <h1>Job Scout Agent:<br><span>A Mobile Job Pipeline</span></h1>
+  <p class="subtitle">
+    Built an agentic AI workflow in n8n to keep a job pipeline warm while traveling abroad with only a phone. The agent calls three custom tools, ranks job opportunities against a candidate profile, and fails safely when data sources are unavailable.
+  </p>
+  <div class="hero-meta">
+    <span class="meta-chip">MIS 432 &middot; AI in Business</span>
+    <span class="meta-chip">Kenyon Woodley</span>
+    <span class="meta-chip">Western Washington University</span>
+    <span class="meta-chip">n8n &middot; Claude Sonnet 4.6</span>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- Executive Summary -->
+  <div class="section">
+    <div class="section-label">Overview</div>
+    <h2>Executive Summary</h2>
+    <p>This lab explores how an agentic AI workflow differs from a standard LLM chat session. Instead of answering one question at a time, the Job Scout Agent connects three purpose-built tools, calls them in sequence, and produces a ranked application queue that a job seeker can review from a phone while traveling.</p>
+    <p>The workflow was tested in three scenarios: a full successful run ranking eight sample postings, a break test with the Job Feed tool deactivated, and a bad-fit test evaluating a role that was clearly misaligned. Each test was designed to reveal a different dimension of how the agent handles data, guardrails, and failure.</p>
+    <p>The core finding: the agent is only as reliable as its tools and its instructions. Guardrails in the system prompt determined whether the agent failed safely when data was unavailable. Without them, the agent could have invented plausible-sounding jobs that did not exist.</p>
+
+    <div class="takeaway-grid">
+      <div class="takeaway-card">
+        <div class="takeaway-num">8</div>
+        <div class="takeaway-label">Jobs ranked in successful run</div>
+      </div>
+      <div class="takeaway-card">
+        <div class="takeaway-num">3</div>
+        <div class="takeaway-label">Custom tools connected to the agent</div>
+      </div>
+      <div class="takeaway-card">
+        <div class="takeaway-num">93</div>
+        <div class="takeaway-label">Top fit score (Anduril Procurement Analyst)</div>
+      </div>
+      <div class="takeaway-card">
+        <div class="takeaway-num">0</div>
+        <div class="takeaway-label">Jobs invented when Job Feed was deactivated</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- What is Agentic AI -->
+  <div class="section">
+    <div class="section-label">Section 1</div>
+    <h2>What Is Agentic AI?</h2>
+    <p>A normal LLM is mostly text in, text out. It can give advice, summarize a job description, or write a plan, but it depends on the user to bring all the information into the chat. A Level 2 agent can use tools, but the user still directs each step. A more agentic workflow is different: the designer connects the tools, sets the guardrails, and gives the agent a goal.</p>
+    <p>For this lab, the recurring task is keeping a job pipeline warm while traveling abroad with only a phone. A Level 2 version would require pasting one job description at a time and asking if it is a fit. The Level 3 version built here calls a Candidate Profile tool, pulls Job Search Parameters, retrieves a Job Feed, and ranks the available roles into an application queue automatically.</p>
+    <p>The agent supports the decision but should not own the decision. Every recommendation still requires human review before applying, changing a resume, or contacting anyone.</p>
+
+    <div class="callout">
+      <div class="callout-label">Key Distinction</div>
+      A standard LLM gives advice when asked. An agentic workflow collects its own context, reasons across tool outputs, and produces a structured decision artifact. The agent does not wait to be prompted for each piece of information.
+    </div>
+  </div>
+
+  <!-- Workflow Architecture -->
+  <div class="section">
+    <div class="section-label">Section 2</div>
+    <h2>Workflow Architecture</h2>
+    <p>The workflow was built in n8n. A Chat Trigger node receives the user's request and passes it to an AI Agent node. The AI Agent is backed by Claude Sonnet 4.6 via the Anthropic Chat Model node. Three Code Tool nodes are connected to the AI Agent and available for it to call at any time.</p>
+
+    <div class="flow-diagram">
+      <div class="flow-row">
+        <div class="flow-node trigger">Chat Trigger</div>
+        <div class="flow-arrow">&#8594;</div>
+        <div class="flow-node agent">AI Agent</div>
+        <div class="flow-arrow">&#8594;</div>
+        <div class="flow-node model">Anthropic Chat Model (Claude Sonnet 4.6)</div>
+      </div>
+      <div class="flow-row" style="margin-top:0.25rem;">
+        <div style="font-size:0.72rem;color:var(--muted);width:100%;padding-left:0.5rem;">AI Agent Tools (called autonomously in sequence):</div>
+      </div>
+      <div class="flow-tools">
+        <div class="flow-node tool">Candidate Profile</div>
+        <div class="flow-node tool">Job Search Parameters</div>
+        <div class="flow-node tool">Job Feed</div>
+      </div>
+    </div>
+
+    <h3>Tool Design</h3>
+    <p>Each tool is a Code Tool node in n8n that returns a structured payload. The Candidate Profile tool returns the candidate's internship history, target roles, and weak-fit signals. The Job Search Parameters tool returns scoring rules, location preferences, and compensation floors. The Job Feed tool returns a structured JSON array of job postings for the agent to rank.</p>
+    <p>The agent must call all three tools before producing any ranked output. This prevents it from making assumptions about the candidate's background or inventing job postings from general knowledge.</p>
+
+    <div class="screenshot-wrap">
+      <div class="screenshot-placeholder">
+        <div class="placeholder-icon">&#9638;</div>
+        Screenshot captured in n8n workflow logs.
+      </div>
+      <div class="screenshot-caption">n8n workflow canvas showing Chat Trigger, AI Agent, Anthropic Chat Model, and three tool nodes</div>
+    </div>
+
+    <h3>System Prompt: Key Rules</h3>
+    <div class="code-label">System Prompt Excerpt (from job-scout-agent.json)</div>
+    <div class="code-block">You are Job Scout Agent, an agentic AI workflow designed to help Kenyon keep
+his job pipeline warm while he is traveling abroad with only his phone.
+
+Required tools:
+You must call all three tools before ranking jobs:
+1. Candidate Profile
+2. Job Search Parameters
+3. Job Feed
+
+Critical rule:
+If the Job Feed tool does not return a jobs array, stop and say:
+"The job feed is misconfigured or unavailable."
+Do not invent job postings from general knowledge.
+
+Guardrails:
+- Never claim Kenyon has experience he does not have.
+- Never recommend auto-applying.
+- Never invent job postings, salary ranges, application links,
+  posted dates, deadlines, or requirements.
+- If salary is not listed, write "Not listed."
+- Accuracy and usefulness matter more than sounding impressive.</div>
+  </div>
+
+  <!-- Building the Agent / Normal Run -->
+  <div class="section">
+    <div class="section-label">Section 3</div>
+    <h2>Building the Job Scout Agent</h2>
+    <p>In the successful run, the agent called all three tools and confirmed what each one returned before ranking the jobs. It ranked Anduril's Procurement Analyst role and RTX's Supply Chain Rotational Associate role highest, which made sense based on the candidate's sourcing, supply chain, and aerospace background.</p>
+    <p>The output was useful because it did not just summarize jobs. It created a phone-friendly application queue with fit scores, risks, and next steps that could be reviewed without a laptop.</p>
+
+    <h3>Tool Check Output</h3>
+    <div class="card" style="margin-bottom:1rem;">
+      <div class="status-row">
+        <span class="status-ok">&#10003;</span>
+        <span class="status-name">Candidate Profile</span>
+        <span class="status-desc">Returned background, skills, internships (SpaceX, REI), target roles, and weak-fit signals</span>
+      </div>
+      <div class="status-row">
+        <span class="status-ok">&#10003;</span>
+        <span class="status-name">Job Search Parameters</span>
+        <span class="status-desc">Returned scoring rules, target roles, location preferences, and $75K+ compensation floor</span>
+      </div>
+      <div class="status-row">
+        <span class="status-ok">&#10003;</span>
+        <span class="status-name">Job Feed</span>
+        <span class="status-desc">Returned 8 jobs in sample/test mode. No jobs invented or added from outside the feed.</span>
+      </div>
+    </div>
+
+    <h3>Ranked Application Queue</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Company</th>
+            <th>Role</th>
+            <th>Location</th>
+            <th>Score</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td class="company-name">Anduril Industries</td>
+            <td>Procurement Analyst</td>
+            <td>Costa Mesa, CA</td>
+            <td class="score-high">93</td>
+            <td class="action-apply">Apply</td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td class="company-name">RTX</td>
+            <td>Supply Chain Rotational Associate</td>
+            <td>Dallas, TX</td>
+            <td class="score-high">91</td>
+            <td class="action-apply">Apply</td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td class="company-name">Space Systems Manufacturer</td>
+            <td>Buyer / Planner</td>
+            <td>Long Beach, CA</td>
+            <td class="score-high">85</td>
+            <td class="action-apply">Apply</td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td class="company-name">Blue Origin</td>
+            <td>Materials Planner</td>
+            <td>Kent, WA</td>
+            <td class="score-mid">80</td>
+            <td class="action-save">Save</td>
+          </tr>
+          <tr>
+            <td>5</td>
+            <td class="company-name">Parker Hannifin</td>
+            <td>Operations Leadership Dev Program</td>
+            <td>Cleveland, OH</td>
+            <td class="score-mid">78</td>
+            <td class="action-apply">Apply</td>
+          </tr>
+          <tr>
+            <td>6</td>
+            <td class="company-name">Apple</td>
+            <td>Senior Strategic Sourcing Manager</td>
+            <td>Cupertino, CA</td>
+            <td class="score-low">28</td>
+            <td class="action-skip">Skip</td>
+          </tr>
+          <tr>
+            <td>7</td>
+            <td class="company-name">RetailCo</td>
+            <td>Business Analyst, Marketing Analytics</td>
+            <td>Seattle, WA</td>
+            <td class="score-low">22</td>
+            <td class="action-skip">Skip</td>
+          </tr>
+          <tr>
+            <td>8</td>
+            <td class="company-name">Uber</td>
+            <td>Data Scientist, Marketplace Optimization</td>
+            <td>San Francisco, CA</td>
+            <td class="score-low">10</td>
+            <td class="action-skip">Skip</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="screenshot-wrap">
+      <img src="assets/normal-output-and-logs.png" alt="Normal run output and n8n execution logs showing all three tools called successfully" />
+      <div class="screenshot-caption">Normal run: all three tools returned successfully, agent produced ranked queue with fit scores and phone-first next steps</div>
+    </div>
+  </div>
+
+  <!-- Breaking the Agent -->
+  <div class="section">
+    <div class="section-label">Section 4</div>
+    <h2>Breaking the Agent</h2>
+    <p>To test failure behavior, the Job Feed tool was deactivated in n8n and the same job recommendation prompt was run again. This was the most important break test because the job feed is the agent's only source of actual opportunities. Without it, the agent should not create a ranked list.</p>
+    <p>The agent failed safely. It called the remaining two tools, noticed that the Job Feed tool was unavailable, and stopped instead of inventing jobs. That was exactly the behavior required by the guardrail in the system prompt.</p>
+
+    <div class="callout">
+      <div class="callout-label">Break Test Result</div>
+      "The job feed is misconfigured or unavailable. I cannot rank, score, or recommend any job postings at this time because doing so would require me to invent job listings, which I will not do. Fabricated postings could send you after roles that are expired, misrepresented, or don't exist, which wastes your time while you're traveling."
+    </div>
+
+    <h3>Tool Check: Break Test</h3>
+    <div class="card" style="margin-bottom:1rem;">
+      <div class="status-row">
+        <span class="status-ok">&#10003;</span>
+        <span class="status-name">Candidate Profile</span>
+        <span class="status-desc">Returned Kenyon's full background, skills, internships, and target roles</span>
+      </div>
+      <div class="status-row">
+        <span class="status-ok">&#10003;</span>
+        <span class="status-name">Job Search Parameters</span>
+        <span class="status-desc">Returned search criteria and scoring rules</span>
+      </div>
+      <div class="status-row">
+        <span class="status-fail">&#10007;</span>
+        <span class="status-name">Job Feed</span>
+        <span class="status-desc">Not available. No Job Feed tool registered in this environment. Agent stopped here.</span>
+      </div>
+    </div>
+
+    <p>This test showed that tools make an agent useful, but guardrails determine whether it fails safely. A weaker agent without an explicit stop rule might have created fake job postings from general knowledge, which would waste time and could send a job seeker after roles that do not exist.</p>
+
+    <div class="screenshot-wrap">
+      <img src="assets/break-test-job-feed-deactivated.png" alt="Break test output showing agent stopping when Job Feed tool was deactivated" />
+      <div class="screenshot-caption">Break test: Job Feed tool deactivated. Agent called Candidate Profile and Job Search Parameters, then stopped and flagged the missing tool rather than inventing postings.</div>
+    </div>
+  </div>
+
+  <!-- Bad-Fit Test -->
+  <div class="section">
+    <div class="section-label">Section 5</div>
+    <h2>Bad-Fit Test</h2>
+    <p>The agent was tested on a clearly misaligned role: Senior Data Scientist, Marketplace Optimization at Uber. The role offered a strong salary ($130K&ndash;$160K) and a well-known company, but it required production machine learning, advanced Python, statistics, and model deployment. Those requirements do not match a target path in sourcing, procurement, operations, or supply chain.</p>
+    <p>The agent correctly scored the role low and recommended Skip. It explained that the role was a poor fit because it was pure data science, too technical, and misaligned with the stated career direction. It did not chase the salary or the brand name.</p>
+
+    <h3>Evaluation: Senior Data Scientist, Marketplace Optimization at Uber</h3>
+    <div class="card">
+      <div class="card-title">
+        <span style="color:var(--red);">&#9679;</span> Fit Score: 22 / 100 &nbsp;&middot;&nbsp; Recommended Action: SKIP
+      </div>
+      <div class="card-body">
+        <strong style="color:#d8d8e8;">Role fit:</strong> Pure data science / ML engineering. Target roles are sourcing, procurement, planning, and operations &mdash; not model deployment.<br>
+        <strong style="color:#d8d8e8;">Industry fit:</strong> Uber is a tech marketplace company, not aerospace, defense, or advanced manufacturing.<br>
+        <strong style="color:#d8d8e8;">Seniority:</strong> Requires production model deployment. Candidate is a new graduate.<br>
+        <strong style="color:#d8d8e8;">Skills:</strong> Requires Python, ML, and statistics at a production level. Candidate skills are Excel, SQL exposure, cost modeling, and sourcing workflows.<br>
+        <strong style="color:#d8d8e8;">Long-term value:</strong> Taking a pure ML role would move the candidate away from the target career track in supply chain and operations leadership.
+      </div>
+    </div>
+
+    <div class="callout">
+      <div class="callout-label">Key Insight</div>
+      A useful job-search agent should protect the candidate's attention, not just show impressive company names. High salary and a recognizable brand are not substitutes for role fit.
+    </div>
+
+    <div class="screenshot-wrap">
+      <img src="assets/bad-fit-test-output.png" alt="Bad-fit test output showing Uber Data Scientist role scored 22 out of 100 with Skip recommendation" />
+      <div class="screenshot-caption">Bad-fit test: Uber Senior Data Scientist scored 22/100 with a clear Skip recommendation and an explanation of every dimension that was misaligned</div>
+    </div>
+  </div>
+
+  <!-- Auditing the Output -->
+  <div class="section">
+    <div class="section-label">Section 6</div>
+    <h2>Auditing the Output</h2>
+    <p>The output was audited by checking whether ranked jobs came from the Job Feed and whether the agent invented anything outside the tool data. In the successful run, the agent ranked only the eight jobs from the structured Job Feed and clearly stated that the feed was sample data.</p>
+    <p>The agent also flagged salary estimates, manual verification requirements, and missing posted dates instead of pretending those details were confirmed. Ranking logic was mostly reasonable: Anduril, RTX, the Space Systems Buyer/Planner role, Blue Origin, and Parker Hannifin were ranked above weak-fit roles.</p>
+    <p>The biggest limitation is that the feed was sample data rather than live postings. At scale, auditing every result manually would not be realistic. More scalable checks would include verifying that every ranked job has a source URL, flagging missing salary or application links, deduplicating postings, sample-checking high-fit recommendations, and tracking whether the agent's top picks are actually worth pursuing over time.</p>
+
+    <div class="card">
+      <div class="card-title">Audit Checklist: What the Agent Got Right</div>
+      <div class="card-body">
+        &#10003; Only ranked jobs from the Job Feed, not from general knowledge<br>
+        &#10003; Labeled salary ranges as estimated when not confirmed<br>
+        &#10003; Flagged missing posted dates on all listings<br>
+        &#10003; Noted that application links require manual verification<br>
+        &#10003; Stated clearly that the feed was sample/test data<br>
+        &#10003; Did not overstate candidate qualifications on any posting
+      </div>
+    </div>
+  </div>
+
+  <!-- AI Governance Brief -->
+  <div class="section">
+    <div class="section-label">Section 7</div>
+    <h2>AI Governance Brief</h2>
+    <p>A governance framework defines what the Job Scout Agent is allowed to do, what it cannot do, and how it should be monitored over time.</p>
+
+    <div class="gov-grid">
+      <div class="gov-card">
+        <div class="gov-card-title">Purpose and Scope</div>
+        <div class="gov-card-body">The agent may rank job opportunities, explain fit, and suggest next actions. It may not apply to jobs, message recruiters, rewrite a resume with unverified claims, or bypass job-board restrictions.</div>
+      </div>
+      <div class="gov-card">
+        <div class="gov-card-title">Data Access and Privacy</div>
+        <div class="gov-card-body">The agent may only access career data intentionally provided: resume profile, job preferences, and job postings. It may not store login credentials, scrape protected platforms, or expose personal job-search data publicly.</div>
+      </div>
+      <div class="gov-card">
+        <div class="gov-card-title">Human Oversight</div>
+        <div class="gov-card-body">Every recommendation requires human review before any action. Applications, networking messages, resume edits, and decisions to pursue or skip a role all require approval before the agent acts.</div>
+      </div>
+      <div class="gov-card">
+        <div class="gov-card-title">Testing and Auditing</div>
+        <div class="gov-card-body">The system should be tested against strong-fit, medium-fit, and bad-fit roles. Track whether the agent invents jobs, misreads requirements, overstates qualifications, or recommends roles that do not match stated preferences.</div>
+      </div>
+      <div class="gov-card">
+        <div class="gov-card-title">Monitoring and Sunset</div>
+        <div class="gov-card-body">Review the agent if recommendations become stale, if job sources stop working, or if it starts ranking poor-fit jobs highly. If the job feed fails, the system must stop rather than invent data.</div>
+      </div>
+      <div class="gov-card">
+        <div class="gov-card-title">Hardest Layer to Get Right</div>
+        <div class="gov-card-body">Data access and source quality. The tool is only valuable with real, current postings, but many platforms restrict scraping. The system must remain useful without crossing platform boundaries or producing fake opportunities.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Should We Be Using AI Agents for This? -->
+  <div class="section">
+    <div class="section-label">Section 8</div>
+    <h2>Should We Be Using AI Agents for This?</h2>
+    <p>The biggest concern is not that the agent will replace human judgment. The bigger concern is that a bad agent could quietly create a misleading job pipeline. If it invents roles, overstates fit, ignores seniority requirements, or pushes toward jobs that do not match stated goals, it could waste time and damage an application strategy.</p>
+    <p>The benefits outweigh the risks if the system is designed correctly. The guardrail is straightforward: the agent can recommend, rank, and draft notes, but it cannot apply or contact anyone without human approval. It also cannot invent jobs or bypass restricted platforms. If the system only works from verified feeds, manually supplied postings, or job alerts, it becomes a useful assistant rather than a risky automation.</p>
+    <p>The core question is not whether to use AI, but whether the workflow has enough guardrails to fail safely when the inputs are wrong or the tools are broken.</p>
+  </div>
+
+  <!-- Personal Reflection -->
+  <div class="section">
+    <div class="section-label">Section 9</div>
+    <h2>My Personal Agent Reflection</h2>
+    <p>I would let this agent run in the background to collect and rank opportunities, but I would not let it run unsupervised through application submission. Before trusting it more, it would need to prove over several weeks that it can rank jobs accurately, avoid fake postings, reject poor-fit roles, and produce useful next steps from real job feeds.</p>
+    <p>Compared with healthcare agents like an insurance appeal agent, the stakes here are lower, but the governance logic is similar. In both cases, the agent can draft and prioritize, but a human should review before anything is submitted. For a job search, the risk is wasted time or poor positioning. In healthcare, the risk could affect patient care or reimbursement. The common lesson is that agentic AI is strongest when it expands human capacity without removing human accountability.</p>
+  </div>
+
+  <!-- Future Version -->
+  <div class="section">
+    <div class="section-label">Section 10</div>
+    <h2>Future Version</h2>
+    <p>The current workflow uses a static sample job feed. A production version would need live data sources and several additional capabilities.</p>
+
+    <div class="card">
+      <div class="card-title">Planned Upgrades</div>
+      <div class="card-body">
+        <strong style="color:#d8d8e8;">Live job feeds:</strong> Replace the static sample with real-time postings from company career page APIs, LinkedIn job search, HiringCafe, or a curated Google Sheet updated weekly.<br><br>
+        <strong style="color:#d8d8e8;">Scheduled runs:</strong> Trigger the workflow on a weekly schedule using n8n's cron trigger and push a summary notification to a phone via Telegram or email.<br><br>
+        <strong style="color:#d8d8e8;">Application tracking:</strong> Add a status tool that records which jobs were applied to, which are pending, and which need follow-up. Surface jobs approaching their deadline.<br><br>
+        <strong style="color:#d8d8e8;">Resume tailoring:</strong> For any role scoring above 85, trigger a second agent pass that identifies specific resume sections to update based on the job description.<br><br>
+        <strong style="color:#d8d8e8;">Source verification:</strong> Add a lightweight check that confirms each recommended posting is still active before surfacing it, reducing the risk of applying to expired roles.
+      </div>
+    </div>
+  </div>
+
+</div><!-- /.container -->
+
+<footer class="site-footer">
+  <span>MIS 432: AI in Business &nbsp;&middot;&nbsp; Lab 7: Agentic AI Job Scout</span>
+  <span>Kenyon Woodley &nbsp;&middot;&nbsp; Western Washington University</span>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,120 @@
+return `JOB SEARCH PARAMETERS: Kenyon Woodley
+
+Purpose:
+Find high-quality early-career job opportunities for Kenyon while he is traveling abroad. The goal is not maximum volume. The goal is to surface roles that are genuinely aligned with his background, target industries, location preferences, and fall 2026 availability.
+
+Candidate availability:
+- Graduating June 2026
+- Traveling internationally from late June through early September 2026
+- Best start date: October 2026
+- Fall 2026 starts are strongly preferred
+- Summer 2026 starts may still be included only if the role is exceptionally aligned or likely flexible
+
+Primary target roles:
+- Sourcing Analyst
+- Procurement Analyst
+- Buyer
+- Buyer / Planner
+- Supply Chain Analyst
+- Supply Chain Program Manager
+- Materials Planner
+- Production Planner
+- Supplier Operations
+- Strategic Sourcing Associate
+- Operations Analyst
+- Operations Rotational Program
+- Supply Chain Rotational Program
+- Manufacturing / Operations Leadership Development Program
+
+Target industries:
+- Aerospace
+- Defense
+- Space
+- Advanced manufacturing
+- Hardware
+- Semiconductors
+- Robotics
+- Energy / infrastructure
+- Tech infrastructure or data center operations
+- Operations-heavy technology companies
+
+Strong-fit role signals:
+- Early-career, new-grad, associate, analyst, rotational, or 0-3 years experience
+- Sourcing, procurement, supplier management, RFQs, buying, planning, materials, production readiness, or operations work
+- Cross-functional work with engineering, manufacturing, production, program management, or suppliers
+- Exposure to BOMs, MRP, ERP, cost models, supplier performance, production schedules, NPI, inventory planning, or technical hardware
+- Roles with ownership, ambiguity, learning curve, and business impact
+- Companies building physical products or operating complex supply chains
+
+Weak-fit role signals:
+- Pure software engineering
+- Pure data science or machine learning
+- Pure marketing analytics
+- Accounting-heavy or finance-only roles
+- Sales roles with no operations or supply chain connection
+- Senior manager roles requiring 5+ years, unless the role is unusually aligned and the requirement seems flexible
+- Warehouse-only, shipping-only, or inventory clerk roles with limited growth path
+- Roles that are only dashboard/reporting work with little business ownership
+
+Location preferences:
+- Strong preference to move outside Washington after graduation
+- Strong interest in California, Texas, Chicago, Huntsville, Arizona, Colorado, and other strong aerospace/defense/tech hubs
+- Washington roles should only be included if the company or role is exceptional, such as Microsoft, SpaceX, Blue Origin, or a similarly strong opportunity
+- Remote or hybrid roles are welcome if they are legitimate early-career supply chain, sourcing, operations, or planning roles
+
+Compensation preferences:
+- Prefer roles around $75,000+ base
+- $85,000-$100,000+ is strong
+- Lower compensation may still be acceptable for exceptional aerospace, defense, space, rotational, or high-growth opportunities
+- Include salary range when available
+
+Preferred companies and company types:
+- SpaceX
+- Blue Origin
+- Anduril
+- Relativity Space
+- Apex
+- Tesla
+- Palantir
+- Microsoft
+- RTX
+- Northrop Grumman
+- Lockheed Martin
+- Boeing only for strong non-WA or high-fit roles
+- Honeywell
+- Applied Materials
+- Keysight
+- Semiconductor, defense, aerospace, robotics, and hardware startups with legitimate manufacturing or supply chain functions
+
+Search behavior:
+- Prioritize company career pages when possible
+- Use LinkedIn, HiringCafe, Wellfound, Google Jobs, and other job boards as supplemental sources
+- Do not invent roles
+- Do not return stale postings unless they are still actively open
+- Prefer jobs posted within the last 30 days
+- Include older postings only if they are highly aligned and still open
+- Avoid duplicate listings unless the locations or teams are meaningfully different
+
+Output requirements:
+For each recommended role, include:
+1. Job title
+2. Company
+3. Location
+4. Source
+5. Direct application link
+6. Salary range if available
+7. Posted date if available
+8. Experience requirement
+9. Start date or cohort timing if available
+10. Short fit summary
+11. Potential concern or tradeoff
+12. Recommended action: Apply, Save, Research, or Skip
+
+Scoring guidance:
+- 90-100: Excellent fit. Strongly aligned with Kenyon's target role, industry, experience, and location.
+- 75-89: Good fit. Worth applying if timing/location are workable.
+- 60-74: Possible fit. Save or research, but do not prioritize unless pipeline is light.
+- Below 60: Skip unless there is a unique strategic reason.
+
+Important:
+Kenyon does not want a purely data-analysis job. Data, Excel, SQL, Tableau, and AI workflows are useful tools, but the ideal role involves business ownership, suppliers, sourcing, planning, operations, technical products, or cross-functional execution.`;

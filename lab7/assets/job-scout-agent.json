@@ -1,0 +1,171 @@
+{
+  "name": "Job Scout Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        0,
+        0
+      ],
+      "id": "026d6ca4-7945-4cb1-96d6-800d0138cb6a",
+      "name": "When chat message received",
+      "webhookId": "c9aaa5b3-da01-4723-9eb6-41214f1099e3"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "You are Job Scout Agent, an agentic AI workflow designed to help Kenyon keep his job pipeline warm while he is traveling abroad with only his phone.\n\nYour job is to evaluate job opportunities against Kenyon's candidate profile, job search parameters, and long-term career goals. You do not apply to jobs. You do not scrape restricted platforms. You do not bypass CAPTCHA, logins, paywalls, or job board protections. You create a ranked application queue for human review.\n\nRequired tools:\nYou must call all three tools before ranking jobs:\n\n1. Candidate Profile\nUse this tool to understand Kenyon's resume background, experience, skills, strengths, weak-fit areas, and target career direction.\n\n2. Job Search Parameters\nUse this tool to understand Kenyon's target roles, target industries, location preferences, compensation preferences, timing, scoring rules, and output requirements.\n\n3. Job Feed\nUse this tool to retrieve the available job postings for this run. The Job Feed returns structured JSON. Only rank jobs inside the jobs array.\n\nCritical rule:\nIf the Job Feed tool does not return a jobs array, stop and say: \"The job feed is misconfigured or unavailable.\" Do not invent job postings from general knowledge.\n\nWorkflow:\nWhen the user asks for job recommendations:\n\n1. Read the user's request carefully.\n2. Call Candidate Profile.\n3. Call Job Search Parameters.\n4. Call Job Feed.\n5. Briefly confirm what each tool returned.\n6. Compare only the jobs from the Job Feed jobs array against Kenyon's profile and search parameters.\n7. Score each job from 0 to 100 based on role fit, industry fit, seniority fit, location fit, compensation if available, resume alignment, and long-term career value.\n8. Recommend an action for each job:\n   - Apply\n   - Save\n   - Research\n   - Skip\n9. Prioritize quality over volume. Unless the user asks for all jobs, highlight the top 5 and briefly summarize the lower-fit jobs.\n\nScoring guidance:\n- 90-100: Excellent fit. Strongly aligned with Kenyon's target role, industry, experience, timing, and location preferences.\n- 75-89: Good fit. Worth applying if timing and location are workable.\n- 60-74: Possible fit. Save or research, but do not prioritize unless the pipeline is light.\n- Below 60: Skip unless there is a unique strategic reason.\n\nGuardrails:\n- Never claim Kenyon has experience he does not have.\n- Never recommend auto-applying.\n- Never invent job postings, salary ranges, application links, posted dates, deadlines, or requirements.\n- If salary is not listed, write \"Not listed.\"\n- If a role is senior-level, pure data science, pure software engineering, pure marketing analytics, accounting-heavy, sales-heavy, or mostly repetitive admin, penalize it unless there is a strong strategic reason.\n- If a job has a strong company brand but weak role fit, say that clearly.\n- If a role is worth networking before applying, explain why under the recommended action.\n- Accuracy and usefulness matter more than sounding impressive.\n\nOutput format:\n\n1. Tool check\nBriefly confirm:\n- Candidate Profile returned Kenyon's background.\n- Job Search Parameters returned search criteria and scoring rules.\n- Job Feed returned the number of jobs available.\n\n2. Ranked application queue\nCreate a clean table with:\n- Rank\n- Company\n- Job title\n- Location\n- Source\n- Salary\n- Fit score\n- Recommended action\n- Why it matches\n- Risk or concern\n- Phone-first next step\n\n3. Top 3 priorities\nAfter the table, summarize the top 3 actions Kenyon should take from his phone.\n\n4. Limitations\nEnd with one short note on limitations, especially if the feed is sample data or if application links/salaries require manual verification."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "0c8ac384-c09d-4df2-8a8f-bd0306454e92",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "claude-sonnet-4-6",
+          "cachedResultName": "Claude Sonnet 4.6"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.5,
+      "position": [
+        96,
+        192
+      ],
+      "id": "99a431f4-0b34-4223-9471-25a8a60f29d9",
+      "name": "Anthropic Chat Model",
+      "credentials": {
+        "anthropicApi": {
+          "id": "AgvOzofSCocCCTJU",
+          "name": "Anthropic account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "description": "Call this tool to retrieve Kenyon's candidate profile, resume background, skills, target roles, industries, and job search preferences.",
+        "jsCode": "return `CANDIDATE PROFILE: Kenyon Woodley\n\nCurrent status:\n- Senior at Western Washington University\n- Major: Manufacturing and Supply Chain Management\n- Minor: Business Analytics\n- Graduating June 2026\n- Traveling internationally from late June through early September 2026\n- Targeting fall 2026 / October 2026 start dates\n- Needs a mobile-friendly job pipeline while abroad\n\nCore experience:\n- SpaceX internship: mechanical sourcing, supplier evaluation, RFQ execution, should-cost modeling, dual-sourcing, supplier onboarding, purchase order support, and Starlink propulsion component sourcing\n- REI supply chain internship: cost-to-serve modeling, distribution center analysis, operational cost categorization, SQL/Excel analysis, and cross-functional communication\n- ASCM president: student leadership, industry networking, resume workshops, speaker coordination, and officer team management\n- Research/work-study experience: procurement research, data organization, project support, and AI-assisted workflow development\n\nSkills:\n- Strategic sourcing\n- RFQs and supplier communication\n- Cost modeling and should-cost analysis\n- Procurement and supply chain workflows\n- Excel, SQL exposure, Tableau, Sigma, Snowflake\n- Data cleaning and structured analysis\n- Cross-functional communication\n- Operations and supply chain problem solving\n- AI workflow prototyping\n\nTarget roles:\n- Sourcing Analyst\n- Procurement Analyst\n- Supply Chain Analyst\n- Supply Chain Program Manager\n- Operations Analyst\n- Materials Planner\n- Production Planner\n- Buyer / Planner\n- Supplier Operations\n- Rotational supply chain or operations programs\n- Early-career roles in aerospace, defense, space, hardware, advanced manufacturing, tech infrastructure, or operations-heavy companies\n\nStrong fit signals:\n- Aerospace, defense, space, hard-tech, advanced manufacturing, or hardware company\n- Supply chain, sourcing, procurement, planning, supplier management, operations, or program-facing role\n- Early-career or rotational program\n- Work involving suppliers, cost, risk, production readiness, BOMs, RFQs, MRP/ERP, or cross-functional execution\n- Roles with ownership, learning curve, technical exposure, and strategic decision-making\n\nWeak fit signals:\n- Pure software engineering\n- Pure data science\n- Senior manager roles requiring 5+ years\n- Accounting-heavy or finance-only roles\n- Sales roles with no operations, supply chain, or technical product connection\n- Warehouse-only or inventory-only roles with limited growth path\n- Roles that are only deep analytics with little business, people, strategy, or operational ownership\n\nLocation preferences:\n- Strong preference to move outside Washington after graduation\n- Open to major cities and strong aerospace/defense/tech hubs\n- Interested in locations such as California, Texas, Chicago, Huntsville, and other high-opportunity markets\n- Seattle/Washington is only attractive for exceptional companies or roles, such as Microsoft, SpaceX, Blue Origin, or similarly strong opportunities\n\nImportant preference:\nKenyon does not want a role that is purely data analysis. He likes data as a tool, but prefers roles involving business ownership, people, operations, sourcing, supply chain strategy, supplier management, or cross-functional execution.`;// Example: convert the incoming query to uppercase and return it\nreturn query.toUpperCase()"
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "typeVersion": 1.3,
+      "position": [
+        592,
+        176
+      ],
+      "id": "9fee4e0f-88ca-497c-9e68-ef403b316753",
+      "name": "Candidate Profile"
+    },
+    {
+      "parameters": {
+        "description": "Call this tool to retrieve Kenyon's job search parameters, target roles, target industries, location preferences, compensation preferences, scoring rules, and output requirements.",
+        "jsCode": "return `JOB SEARCH PARAMETERS: Kenyon Woodley\n\nPurpose:\nFind high-quality early-career job opportunities for Kenyon while he is traveling abroad. The goal is not maximum volume. The goal is to surface roles that are genuinely aligned with his background, target industries, location preferences, and fall 2026 availability.\n\nCandidate availability:\n- Graduating June 2026\n- Traveling internationally from late June through early September 2026\n- Best start date: October 2026\n- Fall 2026 starts are strongly preferred\n- Summer 2026 starts may still be included only if the role is exceptionally aligned or likely flexible\n\nPrimary target roles:\n- Sourcing Analyst\n- Procurement Analyst\n- Buyer\n- Buyer / Planner\n- Supply Chain Analyst\n- Supply Chain Program Manager\n- Materials Planner\n- Production Planner\n- Supplier Operations\n- Strategic Sourcing Associate\n- Operations Analyst\n- Operations Rotational Program\n- Supply Chain Rotational Program\n- Manufacturing / Operations Leadership Development Program\n\nTarget industries:\n- Aerospace\n- Defense\n- Space\n- Advanced manufacturing\n- Hardware\n- Semiconductors\n- Robotics\n- Energy / infrastructure\n- Tech infrastructure or data center operations\n- Operations-heavy technology companies\n\nStrong-fit role signals:\n- Early-career, new-grad, associate, analyst, rotational, or 0-3 years experience\n- Sourcing, procurement, supplier management, RFQs, buying, planning, materials, production readiness, or operations work\n- Cross-functional work with engineering, manufacturing, production, program management, or suppliers\n- Exposure to BOMs, MRP, ERP, cost models, supplier performance, production schedules, NPI, inventory planning, or technical hardware\n- Roles with ownership, ambiguity, learning curve, and business impact\n- Companies building physical products or operating complex supply chains\n\nWeak-fit role signals:\n- Pure software engineering\n- Pure data science or machine learning\n- Pure marketing analytics\n- Accounting-heavy or finance-only roles\n- Sales roles with no operations or supply chain connection\n- Senior manager roles requiring 5+ years, unless the role is unusually aligned and the requirement seems flexible\n- Warehouse-only, shipping-only, or inventory clerk roles with limited growth path\n- Roles that are only dashboard/reporting work with little business ownership\n\nLocation preferences:\n- Strong preference to move outside Washington after graduation\n- Strong interest in California, Texas, Chicago, Huntsville, Arizona, Colorado, and other strong aerospace/defense/tech hubs\n- Washington roles should only be included if the company or role is exceptional, such as Microsoft, SpaceX, Blue Origin, or a similarly strong opportunity\n- Remote or hybrid roles are welcome if they are legitimate early-career supply chain, sourcing, operations, or planning roles\n\nCompensation preferences:\n- Prefer roles around $75,000+ base\n- $85,000-$100,000+ is strong\n- Lower compensation may still be acceptable for exceptional aerospace, defense, space, rotational, or high-growth opportunities\n- Include salary range when available\n\nPreferred companies and company types:\n- SpaceX\n- Blue Origin\n- Anduril\n- Relativity Space\n- Apex\n- Tesla\n- Palantir\n- Microsoft\n- RTX\n- Northrop Grumman\n- Lockheed Martin\n- Boeing only for strong non-WA or high-fit roles\n- Honeywell\n- Applied Materials\n- Keysight\n- Semiconductor, defense, aerospace, robotics, and hardware startups with legitimate manufacturing or supply chain functions\n\nSearch behavior:\n- Prioritize company career pages when possible\n- Use LinkedIn, HiringCafe, Wellfound, Google Jobs, and other job boards as supplemental sources\n- Do not invent roles\n- Do not return stale postings unless they are still actively open\n- Prefer jobs posted within the last 30 days\n- Include older postings only if they are highly aligned and still open\n- Avoid duplicate listings unless the locations or teams are meaningfully different\n\nOutput requirements:\nFor each recommended role, include:\n1. Job title\n2. Company\n3. Location\n4. Source\n5. Direct application link\n6. Salary range if available\n7. Posted date if available\n8. Experience requirement\n9. Start date or cohort timing if available\n10. Short fit summary\n11. Potential concern or tradeoff\n12. Recommended action: Apply, Save, Research, or Skip\n\nScoring guidance:\n- 90-100: Excellent fit. Strongly aligned with Kenyon's target role, industry, experience, and location.\n- 75-89: Good fit. Worth applying if timing/location are workable.\n- 60-74: Possible fit. Save or research, but do not prioritize unless pipeline is light.\n- Below 60: Skip unless there is a unique strategic reason.\n\nImportant:\nKenyon does not want a purely data-analysis job. Data, Excel, SQL, Tableau, and AI workflows are useful tools, but the ideal role involves business ownership, suppliers, sourcing, planning, operations, technical products, or cross-functional execution.`;"
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "typeVersion": 1.3,
+      "position": [
+        480,
+        176
+      ],
+      "id": "6863e59e-0059-4269-a1f2-5c19803bc1b5",
+      "name": "Job Search Parameters"
+    },
+    {
+      "parameters": {
+        "description": "Call this tool to retrieve the current job feed for ranking. Returns job title, company, location, source, salary, posted date, experience requirement, application link, and job description details. Only jobs returned by this tool should be ranked. In test mode, this tool returns sample postings.",
+        "jsCode": "return JSON.stringify({\n  toolName: \"Job Feed\",\n  mode: \"sample_data_for_testing\",\n  instruction: \"Only rank jobs returned in this feed. Do not invent additional jobs. In a live workflow, replace this sample data with real postings from company career pages, job boards, or search results.\",\n  jobs: [\n    {\n      id: 1,\n      title: \"Supply Chain Rotational Associate\",\n      company: \"RTX\",\n      location: \"Dallas, TX\",\n      source: \"Company careers page\",\n      salary: \"Not listed\",\n      postedDate: \"Sample posting\",\n      experienceRequirement: \"Early career / new graduate\",\n      directApplicationLink: \"https://careers.rtx.com/\",\n      description: \"Entry-level rotational program across supply chain, procurement, materials planning, and operations. Works with aerospace and defense production teams. Requires business, supply chain, operations, or engineering-related degree. Early-career candidates encouraged.\"\n    },\n    {\n      id: 2,\n      title: \"Procurement Analyst\",\n      company: \"Anduril Industries\",\n      location: \"Costa Mesa, CA\",\n      source: \"HiringCafe sample result\",\n      salary: \"$75,000-$95,000 estimated\",\n      postedDate: \"Sample posting\",\n      experienceRequirement: \"0-2 years preferred\",\n      directApplicationLink: \"https://www.anduril.com/careers/\",\n      description: \"Supports tactical sourcing, supplier communication, purchase order follow-up, and hardware procurement. Works with engineering and manufacturing teams in defense technology. Requires strong Excel, supplier communication, and ability to work in a fast-paced environment.\"\n    },\n    {\n      id: 3,\n      title: \"Materials Planner\",\n      company: \"Blue Origin\",\n      location: \"Kent, WA\",\n      source: \"Company careers page\",\n      salary: \"Not listed\",\n      postedDate: \"Sample posting\",\n      experienceRequirement: \"Early career\",\n      directApplicationLink: \"https://www.blueorigin.com/careers\",\n      description: \"Coordinates material availability for aerospace manufacturing. Works with production, procurement, and suppliers to maintain schedules. Requires planning, ERP familiarity, supply chain knowledge, and cross-functional communication.\"\n    },\n    {\n      id: 4,\n      title: \"Business Analyst, Marketing Analytics\",\n      company: \"RetailCo\",\n      location: \"Seattle, WA\",\n      source: \"LinkedIn sample input\",\n      salary: \"$70,000-$85,000\",\n      postedDate: \"Sample posting\",\n      experienceRequirement: \"Entry level\",\n      directApplicationLink: \"Manual verification required\",\n      description: \"Analyzes customer behavior, builds dashboards, and supports marketing campaign reporting. Requires SQL, Tableau, A/B testing, and stakeholder communication. Limited supply chain or operations exposure.\"\n    },\n    {\n      id: 5,\n      title: \"Senior Strategic Sourcing Manager\",\n      company: \"Apple\",\n      location: \"Cupertino, CA\",\n      source: \"Company careers page\",\n      salary: \"Not listed\",\n      postedDate: \"Sample posting\",\n      experienceRequirement: \"7+ years\",\n      directApplicationLink: \"https://jobs.apple.com/\",\n      description: \"Leads global sourcing strategy for hardware components. Requires 7+ years strategic sourcing experience, supplier negotiations, cost modeling, and executive stakeholder management.\"\n    },\n    {\n      id: 6,\n      title: \"Operations Leadership Development Program\",\n      company: \"Parker Hannifin\",\n      location: \"Cleveland, OH\",\n      source: \"Company careers page\",\n      salary: \"Not listed\",\n      postedDate: \"Sample posting\",\n      experienceRequirement: \"New graduate / early career\",\n      directApplicationLink: \"https://www.parker.com/careers\",\n      description: \"Rotational leadership program focused on manufacturing operations, supply chain, continuous improvement, and plant leadership. Designed for early-career graduates. Requires mobility and interest in operations leadership.\"\n    },\n    {\n      id: 7,\n      title: \"Data Scientist, Marketplace Optimization\",\n      company: \"Uber\",\n      location: \"San Francisco, CA\",\n      source: \"LinkedIn sample input\",\n      salary: \"$130,000-$160,000\",\n      postedDate: \"Sample posting\",\n      experienceRequirement: \"Advanced technical / model deployment\",\n      directApplicationLink: \"Manual verification required\",\n      description: \"Builds machine learning models for marketplace forecasting and optimization. Requires Python, statistics, machine learning, experimentation, and production model deployment experience.\"\n    },\n    {\n      id: 8,\n      title: \"Buyer / Planner\",\n      company: \"Space Systems Manufacturer\",\n      location: \"Long Beach, CA\",\n      source: \"HiringCafe sample result\",\n      salary: \"$68,000-$82,000 estimated\",\n      postedDate: \"Sample posting\",\n      experienceRequirement: \"0-2 years\",\n      directApplicationLink: \"Manual verification required\",\n      description: \"Manages purchase orders, supplier follow-up, material availability, and planning support for aerospace hardware. Requires Excel, supplier communication, attention to detail, and ability to support production deadlines.\"\n    }\n  ]\n}, null, 2);"
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "typeVersion": 1.3,
+      "position": [
+        368,
+        176
+      ],
+      "id": "40c25f28-5c29-41e7-a973-a725179230fc",
+      "name": "Job Feed"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anthropic Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Candidate Profile": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Job Search Parameters": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Job Feed": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "aa2b0b53-2b5c-4bc2-a3db-3b5a309505c8",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "99629a4231f86d243ea5cbea4341eeef37e70151d9e36bd15b10ed19017461b6"
+  },
+  "id": "xZ4MY93dpJGcl9wx",
+  "tags": []
+}

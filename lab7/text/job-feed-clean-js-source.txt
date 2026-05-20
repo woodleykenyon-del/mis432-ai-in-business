@@ -1,0 +1,109 @@
+Use this cleaner version:
+
+return JSON.stringify({
+  toolName: "Job Feed",
+  mode: "sample_data_for_testing",
+  instruction: "Only rank jobs returned in this feed. Do not invent additional jobs. In a live workflow, replace this sample data with real postings from company career pages, job boards, or search results.",
+  jobs: [
+    {
+      id: 1,
+      title: "Supply Chain Rotational Associate",
+      company: "RTX",
+      location: "Dallas, TX",
+      source: "Company careers page",
+      salary: "Not listed",
+      postedDate: "Sample posting",
+      experienceRequirement: "Early career / new graduate",
+      directApplicationLink: "https://careers.rtx.com/",
+      description: "Entry-level rotational program across supply chain, procurement, materials planning, and operations. Works with aerospace and defense production teams. Requires business, supply chain, operations, or engineering-related degree. Early-career candidates encouraged."
+    },
+    {
+      id: 2,
+      title: "Procurement Analyst",
+      company: "Anduril Industries",
+      location: "Costa Mesa, CA",
+      source: "HiringCafe sample result",
+      salary: "$75,000-$95,000 estimated",
+      postedDate: "Sample posting",
+      experienceRequirement: "0-2 years preferred",
+      directApplicationLink: "https://www.anduril.com/careers/",
+      description: "Supports tactical sourcing, supplier communication, purchase order follow-up, and hardware procurement. Works with engineering and manufacturing teams in defense technology. Requires strong Excel, supplier communication, and ability to work in a fast-paced environment."
+    },
+    {
+      id: 3,
+      title: "Materials Planner",
+      company: "Blue Origin",
+      location: "Kent, WA",
+      source: "Company careers page",
+      salary: "Not listed",
+      postedDate: "Sample posting",
+      experienceRequirement: "Early career",
+      directApplicationLink: "https://www.blueorigin.com/careers",
+      description: "Coordinates material availability for aerospace manufacturing. Works with production, procurement, and suppliers to maintain schedules. Requires planning, ERP familiarity, supply chain knowledge, and cross-functional communication."
+    },
+    {
+      id: 4,
+      title: "Business Analyst, Marketing Analytics",
+      company: "RetailCo",
+      location: "Seattle, WA",
+      source: "LinkedIn sample input",
+      salary: "$70,000-$85,000",
+      postedDate: "Sample posting",
+      experienceRequirement: "Entry level",
+      directApplicationLink: "Manual verification required",
+      description: "Analyzes customer behavior, builds dashboards, and supports marketing campaign reporting. Requires SQL, Tableau, A/B testing, and stakeholder communication. Limited supply chain or operations exposure."
+    },
+    {
+      id: 5,
+      title: "Senior Strategic Sourcing Manager",
+      company: "Apple",
+      location: "Cupertino, CA",
+      source: "Company careers page",
+      salary: "Not listed",
+      postedDate: "Sample posting",
+      experienceRequirement: "7+ years",
+      directApplicationLink: "https://jobs.apple.com/",
+      description: "Leads global sourcing strategy for hardware components. Requires 7+ years strategic sourcing experience, supplier negotiations, cost modeling, and executive stakeholder management."
+    },
+    {
+      id: 6,
+      title: "Operations Leadership Development Program",
+      company: "Parker Hannifin",
+      location: "Cleveland, OH",
+      source: "Company careers page",
+      salary: "Not listed",
+      postedDate: "Sample posting",
+      experienceRequirement: "New graduate / early career",
+      directApplicationLink: "https://www.parker.com/careers",
+      description: "Rotational leadership program focused on manufacturing operations, supply chain, continuous improvement, and plant leadership. Designed for early-career graduates. Requires mobility and interest in operations leadership."
+    },
+    {
+      id: 7,
+      title: "Data Scientist, Marketplace Optimization",
+      company: "Uber",
+      location: "San Francisco, CA",
+      source: "LinkedIn sample input",
+      salary: "$130,000-$160,000",
+      postedDate: "Sample posting",
+      experienceRequirement: "Advanced technical / model deployment",
+      directApplicationLink: "Manual verification required",
+      description: "Builds machine learning models for marketplace forecasting and optimization. Requires Python, statistics, machine learning, experimentation, and production model deployment experience."
+    },
+    {
+      id: 8,
+      title: "Buyer / Planner",
+      company: "Space Systems Manufacturer",
+      location: "Long Beach, CA",
+      source: "HiringCafe sample result",
+      salary: "$68,000-$82,000 estimated",
+      postedDate: "Sample posting",
+      experienceRequirement: "0-2 years",
+      directApplicationLink: "Manual verification required",
+      description: "Manages purchase orders, supplier follow-up, material availability, and planning support for aerospace hardware. Requires Excel, supplier communication, attention to detail, and ability to support production deadlines."
+    }
+  ]
+}, null, 2);
+
+I’d also change the tool description slightly:
+
+Call this tool to retrieve the current job feed for ranking. Returns job title, company, location, source, salary, posted date, experience requirement, application link, and job description details. Only jobs returned by this tool should be ranked. In test mode, this tool returns sample postings.
